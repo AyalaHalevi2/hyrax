@@ -1,0 +1,40 @@
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+#game-container {
+  width: 100vw;
+  height: 100vh;
+  background-image: url("../assets/forest.png");
+  background-position: 0 0;
+  background-size: auto 100%;
+  image-rendering: pixelated;
+  overflow: hidden;
+  transform: translateZ(0);
+}
+
+#hyrax-runner {
+  position: absolute;
+  bottom: 222px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 106px;
+  height: 80px;
+  background-image: url("../assets/hyrax_run.png");
+  background-repeat: no-repeat;
+  background-size: 458px 111px;
+  background-position-y: 0;
+  image-rendering: pixelated;
+  animation: run-cycle 0.4s steps(4) infinite;
+}
+
+@keyframes run-cycle {
+  from {
+    background-position-x: 0;
+  }
+  to {
+    background-position-x: -448px;
+  }
+}
