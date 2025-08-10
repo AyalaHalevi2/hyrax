@@ -13,11 +13,15 @@ var __extends = (this && this.__extends) || (function () {
 })();
 var offset = 0;
 var jumpDuration = 250; //ms
-var scrollSpeed = 1;
+var scrollSpeed = 2;
 var jumpHeight = 20; //
 var hyraxHeight = 30; //%
-var score = sessionStorage.getItem("score") ? JSON.parse(sessionStorage.getItem("score")) : 0;
-var maxScore = localStorage.getItem("maxscore") ? JSON.parse(localStorage.getItem("maxscore")) : 0;
+var score = sessionStorage.getItem("score")
+    ? JSON.parse(sessionStorage.getItem("score"))
+    : 0;
+var maxScore = localStorage.getItem("maxscore")
+    ? JSON.parse(localStorage.getItem("maxscore"))
+    : 0;
 var Hyrax = /** @class */ (function () {
     function Hyrax(elment) {
         this.htmlElement = elment;
@@ -32,6 +36,7 @@ var Hyrax = /** @class */ (function () {
         if (this.isJump)
             return;
         this.isJump = true;
+        console.log("jumping: " + offset);
         var computedStyle = window.getComputedStyle(this.htmlElement);
         var currentFrame = computedStyle.backgroundPositionX;
         this.htmlElement.style.animation = "none";
@@ -44,6 +49,7 @@ var Hyrax = /** @class */ (function () {
             setTimeout(function () {
                 _this.htmlElement.style.animation = "run-cycle 0.3s steps(4) infinite";
                 _this.isJump = false;
+                console.log("after jumping: " + offset);
             }, jumpDuration);
         }, jumpDuration);
     };
@@ -55,33 +61,34 @@ var Obstacle = /** @class */ (function () {
     }
     return Obstacle;
 }());
-var Bird = /** @class */ (function (_super) {
-    __extends(Bird, _super);
-    function Bird() {
+var Cactus = /** @class */ (function (_super) {
+    __extends(Cactus, _super);
+    function Cactus() {
         var _this = _super.call(this) || this;
-        _this.position.y = 30; //%
-        _this.renderBird();
+        _this.position.y = 30;
+        _this.renderCactus();
         return _this;
     }
-    Bird.prototype.htmlBird = function () {
-        return "<div class=\"bird\" style=\"bottom: " + this.position.y + "%;\"></div>";
-    };
-    Bird.prototype.renderBird = function () {
+    Cactus.prototype.renderCactus = function () {
         try {
-            var birdsContainer = document.getElementById("birdRoot");
-            if (!birdsContainer)
-                throw new Error("birdRoot element not found");
-            // birdsContainer.textContent+=this.htmlBird()- need to replace this
+            var cactusContainer = document.getElementById("cactusRoot");
+            if (!cactusContainer)
+                throw new Error("cactusRoot element not found");
+            this.htmlElement = document.createElement("div");
+            this.htmlElement.className = "cactus";
+            cactusContainer.appendChild(this.htmlElement);
+            this.htmlElement = this.htmlElement;
         }
         catch (error) {
-            console.error("Error renderBire: ");
+            console.error("Error renderCactus: ");
         }
     };
-    return Bird;
+    return Cactus;
 }(Obstacle));
 window.addEventListener("DOMContentLoaded", function () {
     try {
         animateBackground();
+        bla();
         var hyraxInHTML = document.getElementById("hyrax-runner");
         if (!hyraxInHTML)
             throw new Error("hyrax-runner element not found");
@@ -102,16 +109,18 @@ function renderScore() {
             throw new Error("scoreRoot not found");
         sessionStorage.setItem("score", JSON.stringify(score));
         scoreinhtml.innerHTML = score;
-        // const maxscoreinhtml = document.getElementById("maxscoreRoot");
-        // if (!maxscoreinhtml) throw new Error("maxscoreRoot not found");
-        // sessionStorage.setItem("maxscore", JSON.stringify(maxScore));
-        // maxScore = score > maxScore ? score : maxScore;
-        // localStorage.setItem("maxscore", JSON.stringify(maxScore));
-        // maxscoreinhtml.innerHTML = maxScore;
     }
     catch (error) {
         console.error("renderScore error: ", error);
     }
+}
+function bla() {
+    setTimeout(function () {
+        var cactus = new Cactus();
+        cactus.htmlElement.style.animation =
+            "cactus-movement 0.3s steps(4) infinite";
+        console.log("cactus moved");
+    }, 2000);
 }
 function animateBackground() {
     try {
@@ -126,26 +135,3 @@ function animateBackground() {
         console.error("animateBackground error: ", error);
     }
 }
-// let offset = 0;
-// const scrollSpeed = 1;
-// const jumpHeight = 120;
-// const jumpDuration = 500;
-// let isJumping = false;
-// function jump() {
-//   if (isJumping) return;
-//   isJumping = true;
-//   const computedStyle = window.getComputedStyle(hyrax);
-//   const currentFrame = computedStyle.backgroundPositionX;
-//   hyrax.style.animation = "none";
-//   hyrax.style.backgroundPositionX = currentFrame;
-//   hyrax.style.transition = `bottom ${jumpDuration / 2}ms ease-out`;
-//   hyrax.style.bottom = `${222 + jumpHeight}px`;
-//   setTimeout(() => {
-//     hyrax.style.transition = `bottom ${jumpDuration / 2}ms ease-in`;
-//     hyrax.style.bottom = `222px`;
-//     setTimeout(() => {
-//       hyrax.style.animation = "run-cycle 0.3s steps(4) infinite";
-//       isJumping = false;
-//     }, jumpDuration / 2);
-//   }, jumpDuration / 2);
-// }

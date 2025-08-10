@@ -38,3 +38,23 @@ body {
     background-position-x: -448px;
   }
 }
+
+.cactus {
+  position: absolute;
+  left: 90vw;
+  height: 100px;
+  width: 100px;
+  background-color: aqua;
+  border-color: black;
+  border: 2cm;
+  bottom: 30%;
+}
+
+@keyframes cactus-movement {
+  0% {
+    left: 104vw;
+  }
+  100% {
+    right: 104vw;
+  }
+}

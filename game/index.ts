@@ -1,10 +1,14 @@
 let offset = 0;
 const jumpDuration = 250; //ms
-const scrollSpeed = 1;
+const scrollSpeed = 2;
 const jumpHeight = 20; //
 const hyraxHeight = 30; //%
-let score = sessionStorage.getItem("score") ? JSON.parse(sessionStorage.getItem("score")!) : 0;
-let maxScore = localStorage.getItem("maxscore") ? JSON.parse(localStorage.getItem("maxscore")!) : 0;
+let score = sessionStorage.getItem("score")
+  ? JSON.parse(sessionStorage.getItem("score")!)
+  : 0;
+let maxScore = localStorage.getItem("maxscore")
+  ? JSON.parse(localStorage.getItem("maxscore")!)
+  : 0;
 class Hyrax {
   htmlElement: HTMLElement;
   posiotion: { x: number; y: number };
@@ -23,6 +27,7 @@ class Hyrax {
   jump() {
     if (this.isJump) return;
     this.isJump = true;
+    console.log("jumping: " + offset);
     const computedStyle = window.getComputedStyle(this.htmlElement);
     const currentFrame = computedStyle.backgroundPositionX;
     this.htmlElement.style.animation = "none";
@@ -37,6 +42,7 @@ class Hyrax {
       setTimeout(() => {
         this.htmlElement.style.animation = "run-cycle 0.3s steps(4) infinite";
         this.isJump = false;
+        console.log("after jumping: " + offset);
       }, jumpDuration);
     }, jumpDuration);
   }
@@ -49,28 +55,31 @@ class Obstacle {
     this.position = { x: 0, y: 0 };
   }
 }
-class Bird extends Obstacle {
+
+class Cactus extends Obstacle {
   constructor() {
     super();
-    this.position.y = 30; //%
-    this.renderBird();
+    this.position.y = 30;
+    this.renderCactus();
   }
-  htmlBird(): string {
-    return `<div class="bird" style="bottom: ${this.position.y}%;"></div>`;
-  }
-  renderBird() {
+  renderCactus() {
     try {
-      const birdsContainer = document.getElementById("birdRoot");
-      if (!birdsContainer) throw new Error("birdRoot element not found");
-      // birdsContainer.textContent+=this.htmlBird()- need to replace this
+      const cactusContainer = document.getElementById("cactusRoot");
+      if (!cactusContainer) throw new Error("cactusRoot element not found");
+      this.htmlElement = document.createElement("div");
+      this.htmlElement.className = "cactus";
+      cactusContainer.appendChild(this.htmlElement);
+      this.htmlElement = this.htmlElement;
     } catch (error) {
-      console.error("Error renderBire: ");
+      console.error("Error renderCactus: ");
     }
   }
 }
+
 window.addEventListener("DOMContentLoaded", () => {
   try {
     animateBackground();
+    bla();
     const hyraxInHTML = document.getElementById("hyrax-runner") as HTMLElement;
     if (!hyraxInHTML) throw new Error("hyrax-runner element not found");
     const hyrax = new Hyrax(hyraxInHTML);
@@ -81,22 +90,27 @@ window.addEventListener("DOMContentLoaded", () => {
     console.error("Event error: ", error);
   }
 });
-function renderScore(): void {
+
+function renderScore() {
   try {
     const scoreinhtml = document.getElementById("scoreRoot");
     if (!scoreinhtml) throw new Error("scoreRoot not found");
     sessionStorage.setItem("score", JSON.stringify(score));
     scoreinhtml.innerHTML = score;
-    // const maxscoreinhtml = document.getElementById("maxscoreRoot");
-    // if (!maxscoreinhtml) throw new Error("maxscoreRoot not found");
-    // sessionStorage.setItem("maxscore", JSON.stringify(maxScore));
-    // maxScore = score > maxScore ? score : maxScore;
-    // localStorage.setItem("maxscore", JSON.stringify(maxScore));
-    // maxscoreinhtml.innerHTML = maxScore;
   } catch (error) {
     console.error("renderScore error: ", error);
   }
 }
+
+function bla() {
+  setTimeout(() => {
+    const cactus = new Cactus();
+    cactus.htmlElement.style.animation =
+      "cactus-movement 0.3s steps(4) infinite";
+    console.log("cactus moved");
+  }, 2000);
+}
+
 function animateBackground() {
   try {
     const container = document.getElementById("game-container") as HTMLElement;
@@ -108,34 +122,3 @@ function animateBackground() {
     console.error("animateBackground error: ", error);
   }
 }
-
-// let offset = 0;
-// const scrollSpeed = 1;
-// const jumpHeight = 120;
-// const jumpDuration = 500;
-
-// let isJumping = false;
-
-// function jump() {
-//   if (isJumping) return;
-
-//   isJumping = true;
-
-//   const computedStyle = window.getComputedStyle(hyrax);
-//   const currentFrame = computedStyle.backgroundPositionX;
-
-//   hyrax.style.animation = "none";
-//   hyrax.style.backgroundPositionX = currentFrame;
-//   hyrax.style.transition = `bottom ${jumpDuration / 2}ms ease-out`;
-//   hyrax.style.bottom = `${222 + jumpHeight}px`;
-
-//   setTimeout(() => {
-//     hyrax.style.transition = `bottom ${jumpDuration / 2}ms ease-in`;
-//     hyrax.style.bottom = `222px`;
-
-//     setTimeout(() => {
-//       hyrax.style.animation = "run-cycle 0.3s steps(4) infinite";
-//       isJumping = false;
-//     }, jumpDuration / 2);
-//   }, jumpDuration / 2);
-// }
