@@ -7,7 +7,7 @@ body {
 #game-container {
   width: 100vw;
   height: 100vh;
-  background-image: url("../assets/forest.png");
+  background-image: url("../assets/forest\ -\ Copy.png");
   background-position: 0 0;
   background-size: auto 100%;
   image-rendering: pixelated;
@@ -17,7 +17,7 @@ body {
 
 #hyrax-runner {
   position: absolute;
-  bottom: 222px;
+  bottom: 30%;
   left: 50%;
   transform: translateX(-50%);
   width: 106px;
