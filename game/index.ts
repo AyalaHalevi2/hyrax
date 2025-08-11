@@ -31,19 +31,22 @@ class Hyrax {
     const currentFrame = computedStyle.backgroundPositionX;
     this.htmlElement.style.animation = "none";
     this.htmlElement.style.backgroundPositionX = currentFrame;
-    this.htmlElement.style.animation = "jump 0.3s ease-in-out";
-    // setTimeout(() => {
-    //   this.htmlElement.style.transition = `bottom ${jumpDuration}ms ease-in`;
-    //   this.htmlElement.style.bottom = `${hyraxHeight}%`;
+        this.htmlElement.style.transition = `bottom ${jumpDuration}ms ease-out`;
+    this.htmlElement.style.bottom = `${hyraxHeight + jumpHeight}%`;
+
+    // this.htmlElement.style.animation = "jump 0.3s ease-in-out";
+    setTimeout(() => {
+      this.htmlElement.style.transition = `bottom ${jumpDuration}ms ease-in`;
+      this.htmlElement.style.bottom = `${hyraxHeight}%`;
 
     setTimeout(() => {
       this.htmlElement.style.animation = "run-cycle 0.3s steps(4) infinite";
       this.isJump = false;
       console.log("after jumping: " + offset);
     }, jumpDuration);
+
+    }, jumpDuration);
   }
-  //   }, jumpDuration);
-  // }
 
   die() {
     this.isDead = true;
@@ -125,7 +128,7 @@ function animateBackground() {
     offset -= scrollSpeed;
     container.style.backgroundPositionX = `${offset}px`;
     requestAnimationFrame(animateBackground);
-  
+
   } catch (error) {
     console.error("animateBackground error: ", error);
   }
