@@ -3,6 +3,7 @@ const jumpDuration = 250; //ms
 const scrollSpeed = 5;
 const jumpHeight = 20; //
 const hyraxHeight = 30; //%
+let run = true;
 let score = sessionStorage.getItem("score") ? JSON.parse(sessionStorage.getItem("score")!) : 0;
 let maxScore = localStorage.getItem("maxscore") ? JSON.parse(localStorage.getItem("maxscore")!) : 0;
 class Hyrax {
@@ -114,20 +115,15 @@ function bla() {
     const container = document.getElementById("game-container");
     if (!container) throw new Error("game-container element not found");
     const frames = container.clientWidth / scrollSpeed;
-
     setInterval(() => {
-      const cactus = new Cactus();
-      //  cactus.htmlElement.addEventListener("animationend", () => {
-      //   cactus.htmlElement.remove();
-      // });
-      cactus.htmlElement.style.animation = `cactus-movement ${frames / 60}s linear forwards`;
-      console.log("cactus moved");
+      const a = Math.floor(Math.random() * 10) * 50;
+      console.log(a);
+      setTimeout(() => {
+        const cactus = new Cactus();
+        cactus.htmlElement.style.animation = `cactus-movement ${frames / 60}s linear forwards`;
+      }, a);
     }, 1000);
   } catch (error) {
-    console.error("Error moving cactus",error);
-    
+    console.error("Error moving cactus: ", error);
   }
-}
-function randomSpace():number{
-  return Math.floor(Math.random())
 }
