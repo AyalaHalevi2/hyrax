@@ -101,7 +101,6 @@ function renderScore() {
     console.error("renderScore error: ", error);
   }
 }
-
 function bla() {
   setTimeout(() => {
     const cactus = new Cactus();
