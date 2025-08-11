@@ -73,7 +73,8 @@ body {
   font-size: 3rem;
 }
 
-.score, .maxscore {
+.score,
+.maxscore {
   display: flex;
   gap: 2rem;
 }

@@ -12,7 +12,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var offset = 0;
-var jumpDuration = 250; //ms
+var jumpDuration = 250;
 var scrollSpeed = 5;
 var jumpHeight = 20; //
 var hyraxHeight = 30; //%
@@ -67,14 +67,21 @@ var Cactus = /** @class */ (function (_super) {
         return _this;
     }
     Cactus.prototype.renderCactus = function () {
+        var _this = this;
         try {
             var cactusContainer = document.getElementById("cactusRoot");
             if (!cactusContainer)
                 throw new Error("cactusRoot element not found");
-            this.htmlElement = document.createElement("div");
-            this.htmlElement.className = "cactus";
-            cactusContainer.appendChild(this.htmlElement);
-            this.htmlElement = this.htmlElement;
+            var el_1 = document.createElement("div");
+            el_1.className = "cactus";
+            cactusContainer.appendChild(el_1);
+            this.htmlElement = el_1;
+            el_1.addEventListener("animationend", function () {
+                el_1.remove();
+                var idx = cacti.indexOf(_this);
+                if (idx !== -1)
+                    cacti.splice(idx, 1);
+            });
         }
         catch (error) {
             console.error("Error renderCactus: ");
@@ -85,14 +92,14 @@ var Cactus = /** @class */ (function (_super) {
 window.addEventListener("DOMContentLoaded", function () {
     try {
         animateBackground();
-        bla();
+        spawnCacti();
         var hyraxInHTML = document.getElementById("hyrax-runner");
         if (!hyraxInHTML)
             throw new Error("hyrax-runner element not found");
-        var hyrax_1 = new Hyrax(hyraxInHTML);
+        hyraxInstance = new Hyrax(hyraxInHTML);
         document.addEventListener("keydown", function (e) {
             if (e.code === "Space" || e.code === "ArrowUp")
-                hyrax_1.jump();
+                hyraxInstance.jump();
         });
     }
     catch (error) {
@@ -118,13 +125,14 @@ function animateBackground() {
             throw new Error("game-container element not found");
         offset -= scrollSpeed;
         container.style.backgroundPositionX = offset + "px";
+        checkCollisions();
         requestAnimationFrame(animateBackground);
     }
     catch (error) {
         console.error("animateBackground error: ", error);
     }
 }
-function bla() {
+function spawnCacti() {
     try {
         var container = document.getElementById("game-container");
         if (!container)
