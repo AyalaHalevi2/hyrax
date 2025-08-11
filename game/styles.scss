@@ -1,6 +1,6 @@
-:root{
+:root {
   font-size: 17px;
-  font-family:"Pixelify Sans", sans-serif;
+  font-family: "Pixelify Sans", sans-serif;
 }
 
 body {
@@ -78,17 +78,16 @@ body {
 .cactus {
   position: absolute;
 
-  height:80px;
+  height: 80px;
   width: 65px;
   // background-color: aqua;
   // border-color: black;
   border: 2cm;
   bottom: 30%;
   background-image: url(../assets/cactus.png);
-  background-size:auto 100%;
+  background-size: auto 100%;
   background-repeat: no-repeat;
-border: 2px solid;
-
+  border: 2px solid;
 }
 
 @keyframes cactus-movement {
@@ -100,17 +99,18 @@ border: 2px solid;
   }
 }
 
-.top{
+.top {
   display: flex;
   color: white;
   height: 10vh;
   // background-color: rgb(78, 51, 15);
   align-items: center;
   justify-content: space-between;
-  padding: 0 10rem ;
+  padding: 0 10rem;
   font-size: 3rem;
 }
-.score, .maxscore{
+.score,
+.maxscore {
   display: flex;
   gap: 2rem;
 }

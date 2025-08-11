@@ -13,16 +13,20 @@ var __extends = (this && this.__extends) || (function () {
 })();
 var offset = 0;
 var jumpDuration = 250; //ms
-var scrollSpeed = 5;
+var scrollSpeed = 4;
 var jumpHeight = 20; //
 var hyraxHeight = 30; //%
 var run = true;
-var score = sessionStorage.getItem("score") ? JSON.parse(sessionStorage.getItem("score")) : 0;
-var maxScore = localStorage.getItem("maxscore") ? JSON.parse(localStorage.getItem("maxscore")) : 0;
+var score = sessionStorage.getItem("score")
+    ? JSON.parse(sessionStorage.getItem("score"))
+    : 0;
+var maxScore = localStorage.getItem("maxscore")
+    ? JSON.parse(localStorage.getItem("maxscore"))
+    : 0;
 var Hyrax = /** @class */ (function () {
     function Hyrax(elment) {
         this.htmlElement = elment;
-        this.posiotion = { x: 0, y: 0 };
+        this.position = { x: 0, y: 0 };
         this.isJump = false;
         this.isDead = false;
         this.isSlide = false;
@@ -33,7 +37,6 @@ var Hyrax = /** @class */ (function () {
         if (this.isJump)
             return;
         this.isJump = true;
-        console.log("jumping: " + offset);
         var computedStyle = window.getComputedStyle(this.htmlElement);
         var currentFrame = computedStyle.backgroundPositionX;
         this.htmlElement.style.animation = "none";
@@ -74,20 +77,21 @@ var Cactus = /** @class */ (function (_super) {
             cactusContainer.appendChild(this.htmlElement);
             this.htmlElement = this.htmlElement;
         }
-        catch (error) {
-            console.error("Error renderCactus: ");
-        }
+        catch (error) { }
     };
     return Cactus;
 }(Obstacle));
 window.addEventListener("DOMContentLoaded", function () {
     try {
         animateBackground();
-        bla();
+        updateCactus();
         var hyraxInHTML = document.getElementById("hyrax-runner");
         if (!hyraxInHTML)
             throw new Error("hyrax-runner element not found");
         var hyrax_1 = new Hyrax(hyraxInHTML);
+        // setInterval(() => {
+        //   isCollision(hyraxInHTML);
+        // }, 1000);
         document.addEventListener("keydown", function (e) {
             if (e.code === "Space" || e.code === "ArrowUp")
                 hyrax_1.jump();
@@ -122,7 +126,7 @@ function animateBackground() {
         console.error("animateBackground error: ", error);
     }
 }
-function bla() {
+function updateCactus() {
     try {
         var container = document.getElementById("game-container");
         if (!container)
@@ -130,7 +134,6 @@ function bla() {
         var frames_1 = container.clientWidth / scrollSpeed;
         setInterval(function () {
             var a = Math.floor(Math.random() * 10) * 50;
-            console.log(a);
             setTimeout(function () {
                 var cactus = new Cactus();
                 cactus.htmlElement.style.animation = "cactus-movement " + frames_1 / 60 + "s linear forwards";
@@ -140,4 +143,7 @@ function bla() {
     catch (error) {
         console.error("Error moving cactus: ", error);
     }
+}
+function isCollision(hyrax) {
+    console.log(hyrax.style.bottom);
 }
