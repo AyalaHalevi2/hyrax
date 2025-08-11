@@ -33,7 +33,38 @@ body {
   background-position-y: 0;
   image-rendering: pixelated;
   animation: run-cycle 0.4s steps(4) infinite;
+
 }
+
+@keyframes jump {
+  0% {
+    bottom: 30%;
+  }
+  25% {
+    bottom: 38%;
+  }
+  45%{
+    bottom: 40%;
+  }
+  50% {
+    bottom: 41%;
+  }
+
+  75% {
+    bottom: 41%;
+  }
+
+  80% {
+    bottom: 41%;
+  }
+  90% {
+    bottom: 35%;
+  }
+  100% {
+    bottom: 30%;
+  }
+}
+
 
 @keyframes run-cycle {
   from {
