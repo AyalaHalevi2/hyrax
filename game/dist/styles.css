@@ -1,3 +1,8 @@
+:root {
+  font-size: 17px;
+  font-family: "Pixelify Sans", sans-serif;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -40,20 +45,34 @@ body {
 }
 .cactus {
   position: absolute;
-  left: 90vw;
-  height: 100px;
-  width: 100px;
-  background-color: aqua;
-  border-color: black;
+  height: 80px;
+  width: 80px;
   border: 2cm;
   bottom: 30%;
+  background-image: url(../assets/cactus.png);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
 }
 
 @keyframes cactus-movement {
   0% {
-    left: 104vw;
+    transform: translateX(104vw);
   }
   100% {
-    right: 104vw;
+    transform: translateX(-104vw);
   }
+}
+.top {
+  display: flex;
+  color: white;
+  height: 10vh;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10rem;
+  font-size: 3rem;
+}
+
+.score, .maxscore {
+  display: flex;
+  gap: 2rem;
 }

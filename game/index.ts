@@ -1,14 +1,10 @@
 let offset = 0;
 const jumpDuration = 250; //ms
-const scrollSpeed = 2;
+const scrollSpeed = 5;
 const jumpHeight = 20; //
 const hyraxHeight = 30; //%
-let score = sessionStorage.getItem("score")
-  ? JSON.parse(sessionStorage.getItem("score")!)
-  : 0;
-let maxScore = localStorage.getItem("maxscore")
-  ? JSON.parse(localStorage.getItem("maxscore")!)
-  : 0;
+let score = sessionStorage.getItem("score") ? JSON.parse(sessionStorage.getItem("score")!) : 0;
+let maxScore = localStorage.getItem("maxscore") ? JSON.parse(localStorage.getItem("maxscore")!) : 0;
 class Hyrax {
   htmlElement: HTMLElement;
   posiotion: { x: number; y: number };
@@ -101,14 +97,6 @@ function renderScore() {
     console.error("renderScore error: ", error);
   }
 }
-function bla() {
-  setTimeout(() => {
-    const cactus = new Cactus();
-    cactus.htmlElement.style.animation =
-      "cactus-movement 0.3s steps(4) infinite";
-    console.log("cactus moved");
-  }, 2000);
-}
 
 function animateBackground() {
   try {
@@ -120,4 +108,26 @@ function animateBackground() {
   } catch (error) {
     console.error("animateBackground error: ", error);
   }
+}
+function bla() {
+  try {
+    const container = document.getElementById("game-container");
+    if (!container) throw new Error("game-container element not found");
+    const frames = container.clientWidth / scrollSpeed;
+
+    setInterval(() => {
+      const cactus = new Cactus();
+      //  cactus.htmlElement.addEventListener("animationend", () => {
+      //   cactus.htmlElement.remove();
+      // });
+      cactus.htmlElement.style.animation = `cactus-movement ${frames / 60}s linear forwards`;
+      console.log("cactus moved");
+    }, 1000);
+  } catch (error) {
+    console.error("Error moving cactus",error);
+    
+  }
+}
+function randomSpace():number{
+  return Math.floor(Math.random())
 }

@@ -4,6 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Hyrax Game</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet" /><!-- font link -->
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="./dist/styles.css" />
     <script src="./dist/index.js" defer></script>
@@ -11,8 +14,16 @@
 
   <body>
     <div id="game-container">
-      <div class="score"><div id="scoreRoot"></div></div>
-      <div class="maxscore"><div id="maxscoreRoot"></div></div>
+      <div class="top">
+        <div class="score">
+          score:
+          <div id="scoreRoot"></div>
+        </div>
+        <div class="maxscore">
+          max score:
+          <div id="maxscoreRoot"></div>
+        </div>
+      </div>
 
       <div id="hyrax-runner"></div>
       <div id="cactusRoot"></div>

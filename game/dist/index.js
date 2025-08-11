@@ -13,15 +13,11 @@ var __extends = (this && this.__extends) || (function () {
 })();
 var offset = 0;
 var jumpDuration = 250; //ms
-var scrollSpeed = 2;
+var scrollSpeed = 5;
 var jumpHeight = 20; //
 var hyraxHeight = 30; //%
-var score = sessionStorage.getItem("score")
-    ? JSON.parse(sessionStorage.getItem("score"))
-    : 0;
-var maxScore = localStorage.getItem("maxscore")
-    ? JSON.parse(localStorage.getItem("maxscore"))
-    : 0;
+var score = sessionStorage.getItem("score") ? JSON.parse(sessionStorage.getItem("score")) : 0;
+var maxScore = localStorage.getItem("maxscore") ? JSON.parse(localStorage.getItem("maxscore")) : 0;
 var Hyrax = /** @class */ (function () {
     function Hyrax(elment) {
         this.htmlElement = elment;
@@ -114,14 +110,6 @@ function renderScore() {
         console.error("renderScore error: ", error);
     }
 }
-function bla() {
-    setTimeout(function () {
-        var cactus = new Cactus();
-        cactus.htmlElement.style.animation =
-            "cactus-movement 0.3s steps(4) infinite";
-        console.log("cactus moved");
-    }, 2000);
-}
 function animateBackground() {
     try {
         var container = document.getElementById("game-container");
@@ -134,4 +122,26 @@ function animateBackground() {
     catch (error) {
         console.error("animateBackground error: ", error);
     }
+}
+function bla() {
+    try {
+        var container = document.getElementById("game-container");
+        if (!container)
+            throw new Error("game-container element not found");
+        var frames_1 = container.clientWidth / scrollSpeed;
+        setInterval(function () {
+            var cactus = new Cactus();
+            //  cactus.htmlElement.addEventListener("animationend", () => {
+            //   cactus.htmlElement.remove();
+            // });
+            cactus.htmlElement.style.animation = "cactus-movement " + frames_1 / 60 + "s linear forwards";
+            console.log("cactus moved");
+        }, 1000);
+    }
+    catch (error) {
+        console.error("Error moving cactus", error);
+    }
+}
+function randomSpace() {
+    return Math.floor(Math.random());
 }
