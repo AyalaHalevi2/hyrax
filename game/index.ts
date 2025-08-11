@@ -1,6 +1,6 @@
 // index.ts
 let offset = 0;
-const jumpDuration = 250; // ms (smoother)
+const jumpDuration = 300  ; // ms (smoother)
 const scrollSpeed = 4;
 const jumpHeight = 20; // px (higher)
 const hyraxHeight = 30; // %

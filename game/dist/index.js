@@ -13,7 +13,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 // index.ts
 var offset = 0;
-var jumpDuration = 250; // ms (smoother)
+var jumpDuration = 300; // ms (smoother)
 var scrollSpeed = 4;
 var jumpHeight = 20; // px (higher)
 var hyraxHeight = 30; // %
