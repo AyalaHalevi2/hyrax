@@ -1,5 +1,5 @@
 let offset = 0;
-const jumpDuration = 250;
+const jumpDuration = 250; //ms
 const scrollSpeed = 5;
 const jumpHeight = 20; //
 const hyraxHeight = 30; //%
@@ -46,7 +46,7 @@ class Hyrax {
 }
 
 class Obstacle {
-  htmlElement!: HTMLElement;
+  htmlElement: HTMLElement;
   position: { x: number; y: number };
   constructor() {
     this.position = { x: 0, y: 0 };
@@ -63,18 +63,10 @@ class Cactus extends Obstacle {
     try {
       const cactusContainer = document.getElementById("cactusRoot");
       if (!cactusContainer) throw new Error("cactusRoot element not found");
-
-      const el = document.createElement("div");
-      el.className = "cactus";
-      cactusContainer.appendChild(el);
-
-      this.htmlElement = el;
-
-      el.addEventListener("animationend", () => {
-        el.remove();
-        const idx = cacti.indexOf(this);
-        if (idx !== -1) cacti.splice(idx, 1);
-      });
+      this.htmlElement = document.createElement("div");
+      this.htmlElement.className = "cactus";
+      cactusContainer.appendChild(this.htmlElement);
+      this.htmlElement = this.htmlElement;
     } catch (error) {
       console.error("Error renderCactus: ");
     }
@@ -84,14 +76,12 @@ class Cactus extends Obstacle {
 window.addEventListener("DOMContentLoaded", () => {
   try {
     animateBackground();
-    spawnCacti();
+    bla();
     const hyraxInHTML = document.getElementById("hyrax-runner") as HTMLElement;
     if (!hyraxInHTML) throw new Error("hyrax-runner element not found");
-
-    hyraxInstance = new Hyrax(hyraxInHTML);
-
+    const hyrax = new Hyrax(hyraxInHTML);
     document.addEventListener("keydown", (e: KeyboardEvent) => {
-      if (e.code === "Space" || e.code === "ArrowUp") hyraxInstance!.jump();
+      if (e.code === "Space" || e.code === "ArrowUp") hyrax.jump();
     });
   } catch (error) {
     console.error("Event error: ", error);
@@ -103,7 +93,6 @@ function renderScore() {
     const scoreinhtml = document.getElementById("scoreRoot");
     if (!scoreinhtml) throw new Error("scoreRoot not found");
     sessionStorage.setItem("score", JSON.stringify(score));
-
     scoreinhtml.innerHTML = score;
   } catch (error) {
     console.error("renderScore error: ", error);
@@ -116,16 +105,12 @@ function animateBackground() {
     if (!container) throw new Error("game-container element not found");
     offset -= scrollSpeed;
     container.style.backgroundPositionX = `${offset}px`;
-
-    checkCollisions();
-
     requestAnimationFrame(animateBackground);
   } catch (error) {
     console.error("animateBackground error: ", error);
   }
 }
-
-function spawnCacti() {
+function bla() {
   try {
     const container = document.getElementById("game-container");
     if (!container) throw new Error("game-container element not found");
@@ -140,28 +125,5 @@ function spawnCacti() {
     }, 1000);
   } catch (error) {
     console.error("Error moving cactus: ", error);
-  }
-}
-
-function rectsOverlap(a: DOMRect, b: DOMRect): boolean {
-  return !(
-    a.right < b.left ||
-    a.left > b.right ||
-    a.bottom < b.top ||
-    a.top > b.bottom
-  );
-}
-
-function checkCollisions(): void {
-  if (!hyraxInstance) return;
-  const hyraxEl = hyraxInstance.htmlElement;
-  const hyraxRect = hyraxEl.getBoundingClientRect();
-
-  for (const c of cacti) {
-    if (!c.htmlElement) continue;
-    const cactusRect = c.htmlElement.getBoundingClientRect();
-    if (rectsOverlap(hyraxRect, cactusRect)) {
-      console.log("Collision");
-    }
   }
 }
