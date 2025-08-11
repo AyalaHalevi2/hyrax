@@ -44,14 +44,12 @@ var Hyrax = /** @class */ (function () {
         var currentFrame = computedStyle.backgroundPositionX;
         this.htmlElement.style.animation = "none";
         this.htmlElement.style.backgroundPositionX = currentFrame;
-        // pass vars to CSS so we can tune from TS
-        this.htmlElement.style.setProperty("--jump-peak", jumpHeight + "px");
-        this.htmlElement.style.setProperty("--jump-duration", jumpDuration + "ms");
-        // smooth jump motion
-        this.htmlElement.style.animation = "jump var(--jump-duration) cubic-bezier(0.2, 0.6, 0.2, 1)";
+        this.htmlElement.style.animation = "jump 0.3s ease-in-out";
+        // setTimeout(() => {
+        //   this.htmlElement.style.transition = `bottom ${jumpDuration}ms ease-in`;
+        //   this.htmlElement.style.bottom = `${hyraxHeight}%`;
         setTimeout(function () {
-            // resume run cycle
-            _this.htmlElement.style.animation = "run-cycle 0.45s steps(4) infinite";
+            _this.htmlElement.style.animation = "run-cycle 0.3s steps(4) infinite";
             _this.isJump = false;
             console.log("after jumping: " + offset);
         }, jumpDuration);

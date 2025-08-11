@@ -52,6 +52,8 @@ class Hyrax {
       this.isJump = false;
       console.log("after jumping: " + offset);
     }, jumpDuration);
+
+    }, jumpDuration);
   }
 
   die() {
