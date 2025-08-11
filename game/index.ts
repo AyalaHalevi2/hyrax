@@ -1,8 +1,8 @@
 // index.ts
 let offset = 0;
-const jumpDuration = 500; // ms (smoother)
+const jumpDuration = 250; // ms (smoother)
 const scrollSpeed = 4;
-const jumpHeight = 60; // px (higher)
+const jumpHeight = 20; // px (higher)
 const hyraxHeight = 30; // %
 let run = true;
 let score = sessionStorage.getItem("score")
@@ -38,17 +38,16 @@ class Hyrax {
     const currentFrame = computedStyle.backgroundPositionX;
     this.htmlElement.style.animation = "none";
     this.htmlElement.style.backgroundPositionX = currentFrame;
+      this.htmlElement.style.transition = `bottom ${jumpDuration}ms ease-out`;
+    this.htmlElement.style.bottom = `${hyraxHeight + jumpHeight}%`;
 
-    // pass vars to CSS so we can tune from TS
-    this.htmlElement.style.setProperty("--jump-peak", `${jumpHeight}px`);
-    this.htmlElement.style.setProperty("--jump-duration", `${jumpDuration}ms`);
-
-    // smooth jump motion
-    this.htmlElement.style.animation = `jump var(--jump-duration) cubic-bezier(0.2, 0.6, 0.2, 1)`;
+    // this.htmlElement.style.animation = "jump 0.3s ease-in-out";
+    setTimeout(() => {
+      this.htmlElement.style.transition = `bottom ${jumpDuration}ms ease-in`;
+      this.htmlElement.style.bottom = `${hyraxHeight}%`;
 
     setTimeout(() => {
-      // resume run cycle
-      this.htmlElement.style.animation = "run-cycle 0.45s steps(4) infinite";
+      this.htmlElement.style.animation = "run-cycle 0.3s steps(4) infinite";
       this.isJump = false;
       console.log("after jumping: " + offset);
     }, jumpDuration);

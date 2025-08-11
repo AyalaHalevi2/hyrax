@@ -1,134 +1,88 @@
-/* =============== Globals & Baseline =============== */
-* {
-  box-sizing: border-box;
-}
-
 :root {
-  /* ground-level relative to viewport height */
-  --ground-level: 30vh; /* 20% from bottom of viewport */
-
-  /* jump tuning (TS can override via style.setProperty) */
-  --jump-peak: 12vh; /* height of jump relative to viewport */
-  --jump-duration: 500ms;
-
-  /* sprite sheet — sizes now relative to viewport width */
-  --hyrax-frame-w: 11vh; /* one frame width */
-  --hyrax-frame-h: 12vh; /* frame height */
-  --hyrax-frames: 4;
-  --hyrax-sheet-w: calc(var(--hyrax-frame-w) * var(--hyrax-frames));
+  font-size: 17px;
+  font-family: "Pixelify Sans", sans-serif;
 }
 
 body {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background: #000; /* fallback */
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 }
 
-/* =============== Stage =============== */
 #game-container {
-  position: relative;
   width: 100vw;
   height: 100vh;
-  background-image: url("../assets/forest.png");
-  background-repeat: repeat-x;
+  background-image: url("../assets/forest\ -\ Copy.png");
   background-position: 0 0;
   background-size: auto 100%;
   image-rendering: pixelated;
+  overflow: hidden;
   transform: translateZ(0);
 }
 
-/* =============== HUD =============== */
-#scoreRoot {
-  position: absolute;
-  top: 2vh;
-  left: 2vw;
-  color: #fff;
-  font-weight: 700;
-  font-size: 2vh; /* scales with height */
-  line-height: 1.2;
-  text-shadow: 0 0.3vh 0.6vh rgba(0, 0, 0, 0.6);
-  z-index: 10;
-}
-
-/* =============== Hyrax =============== */
 #hyrax-runner {
   position: absolute;
-  left: 15%;
-  bottom: var(--ground-level);
-  width: var(--hyrax-frame-w);
-  height: var(--hyrax-frame-h);
+  bottom: 30%;
+  left:20%;
+  transform: translateX(-50%);
+  width: 15vh;
+  height:10vh;
+  border: 2px solid;
   background-image: url("../assets/hyrax_run.png");
   background-repeat: no-repeat;
-  background-size: var(--hyrax-sheet-w) var(--hyrax-frame-h);
-  background-position: 0 0;
+  background-size: 458px 111px;
+  background-position-y: 0;
+  image-rendering: pixelated;
+  animation: run-cycle 0.4s steps(4) infinite;
 
-  will-change: transform, background-position;
-  transform: translateY(0);
-
-  animation: run-cycle 0.45s steps(var(--hyrax-frames)) infinite;
 }
 
-/* =============== Cactus =============== */
-#cactusRoot {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
 
-.cactus {
-  position: absolute;
-  right: -30vw; /* spawn off-screen to the right */
-  bottom: var(--ground-level);
-  width: 14vh;
-  height: 10vh;
-  background-image: url("../assets/cactus.png");
-  background-size: contain;
-  background-repeat: no-repeat;
-  will-change: transform;
-}
-
-/* =============== Animations =============== */
 @keyframes run-cycle {
   from {
     background-position-x: 0;
   }
   to {
-    background-position-x: calc(-1 * var(--hyrax-sheet-w));
+    background-position-x: -448px;
   }
 }
 
-@keyframes jump {
-  0% {
-    transform: translateY(0);
-  }
-  18% {
-    transform: translateY(calc(-0.9 * var(--jump-peak)));
-  }
-  50% {
-    transform: translateY(calc(-1 * var(--jump-peak)));
-  }
-  82% {
-    transform: translateY(calc(-0.9 * var(--jump-peak)));
-  }
-  100% {
-    transform: translateY(0);
-  }
+.cactus {
+  position: absolute;
+
+  height: 80px;
+  width: 65px;
+  // background-color: aqua;
+  // border-color: black;
+  border: 2cm;
+  bottom: 30%;
+  background-image: url(../assets/cactus.png);
+  background-size: auto 100%;
+  background-repeat: no-repeat;
+  border: 2px solid;
 }
 
 @keyframes cactus-movement {
-  from {
-    transform: translateX(0);
+  0% {
+    transform: translateX(104vw);
   }
-  to {
-    transform: translateX(calc(-100vw - 12vw));
+  100% {
+    transform: translateX(-104vw);
   }
 }
 
-/* =============== Optional helpers =============== */
-img,
-.cactus,
-#hyrax-runner {
-  image-rendering: pixelated;
+.top {
+  display: flex;
+  color: white;
+  height: 10vh;
+  // background-color: rgb(78, 51, 15);
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10rem;
+  font-size: 3rem;
+}
+.score,
+.maxscore {
+  display: flex;
+  gap: 2rem;
 }

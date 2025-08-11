@@ -13,9 +13,9 @@ var __extends = (this && this.__extends) || (function () {
 })();
 // index.ts
 var offset = 0;
-var jumpDuration = 500; // ms (smoother)
+var jumpDuration = 250; // ms (smoother)
 var scrollSpeed = 4;
-var jumpHeight = 60; // px (higher)
+var jumpHeight = 20; // px (higher)
 var hyraxHeight = 30; // %
 var run = true;
 var score = sessionStorage.getItem("score")
@@ -44,14 +44,17 @@ var Hyrax = /** @class */ (function () {
         var currentFrame = computedStyle.backgroundPositionX;
         this.htmlElement.style.animation = "none";
         this.htmlElement.style.backgroundPositionX = currentFrame;
-        this.htmlElement.style.animation = "jump 0.3s ease-in-out";
-        // setTimeout(() => {
-        //   this.htmlElement.style.transition = `bottom ${jumpDuration}ms ease-in`;
-        //   this.htmlElement.style.bottom = `${hyraxHeight}%`;
+        this.htmlElement.style.transition = "bottom " + jumpDuration + "ms ease-out";
+        this.htmlElement.style.bottom = hyraxHeight + jumpHeight + "%";
+        // this.htmlElement.style.animation = "jump 0.3s ease-in-out";
         setTimeout(function () {
-            _this.htmlElement.style.animation = "run-cycle 0.3s steps(4) infinite";
-            _this.isJump = false;
-            console.log("after jumping: " + offset);
+            _this.htmlElement.style.transition = "bottom " + jumpDuration + "ms ease-in";
+            _this.htmlElement.style.bottom = hyraxHeight + "%";
+            setTimeout(function () {
+                _this.htmlElement.style.animation = "run-cycle 0.3s steps(4) infinite";
+                _this.isJump = false;
+                console.log("after jumping: " + offset);
+            }, jumpDuration);
         }, jumpDuration);
     };
     Hyrax.prototype.die = function () {
