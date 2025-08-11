@@ -1,11 +1,16 @@
+// index.ts
 let offset = 0;
-const jumpDuration = 250; //ms
+const jumpDuration = 500; // ms (smoother)
 const scrollSpeed = 4;
-const jumpHeight = 20; //
-const hyraxHeight = 30; //%
+const jumpHeight = 60; // px (higher)
+const hyraxHeight = 30; // %
 let run = true;
-let score = sessionStorage.getItem("score") ? JSON.parse(sessionStorage.getItem("score")!) : 0;
-let maxScore = localStorage.getItem("maxscore") ? JSON.parse(localStorage.getItem("maxscore")!) : 0;
+let score = sessionStorage.getItem("score")
+  ? JSON.parse(sessionStorage.getItem("score")!)
+  : 0;
+let maxScore = localStorage.getItem("maxscore")
+  ? JSON.parse(localStorage.getItem("maxscore")!)
+  : 0;
 
 let hyraxInstance: Hyrax;
 
@@ -27,30 +32,33 @@ class Hyrax {
   jump() {
     if (this.isJump) return;
     this.isJump = true;
+
+    // freeze current sprite frame during jump
     const computedStyle = window.getComputedStyle(this.htmlElement);
     const currentFrame = computedStyle.backgroundPositionX;
     this.htmlElement.style.animation = "none";
     this.htmlElement.style.backgroundPositionX = currentFrame;
-    this.htmlElement.style.animation = "jump 0.3s ease-in-out";
-    // setTimeout(() => {
-    //   this.htmlElement.style.transition = `bottom ${jumpDuration}ms ease-in`;
-    //   this.htmlElement.style.bottom = `${hyraxHeight}%`;
+
+    // pass vars to CSS so we can tune from TS
+    this.htmlElement.style.setProperty("--jump-peak", `${jumpHeight}px`);
+    this.htmlElement.style.setProperty("--jump-duration", `${jumpDuration}ms`);
+
+    // smooth jump motion
+    this.htmlElement.style.animation = `jump var(--jump-duration) cubic-bezier(0.2, 0.6, 0.2, 1)`;
 
     setTimeout(() => {
-      this.htmlElement.style.animation = "run-cycle 0.3s steps(4) infinite";
+      // resume run cycle
+      this.htmlElement.style.animation = "run-cycle 0.45s steps(4) infinite";
       this.isJump = false;
       console.log("after jumping: " + offset);
     }, jumpDuration);
   }
-  //   }, jumpDuration);
-  // }
 
   die() {
     this.isDead = true;
     run = false;
     this.htmlElement.style.animation = "none";
     console.log("Game Over! Score:", score);
-    // Update max score if current score is higher
     if (score > maxScore) {
       maxScore = score;
       localStorage.setItem("maxscore", JSON.stringify(maxScore));
@@ -80,7 +88,9 @@ class Cactus extends Obstacle {
       this.htmlElement.className = "cactus";
       cactusContainer.appendChild(this.htmlElement);
       this.htmlElement = this.htmlElement;
-    } catch (error) {}
+    } catch (error) {
+      console.error(error);
+    }
   }
 }
 
@@ -88,16 +98,12 @@ window.addEventListener("DOMContentLoaded", () => {
   try {
     animateBackground();
     updateCactus();
-    startCollisionDetection(); // ADDED THIS LINE
+    startCollisionDetection();
 
     const hyraxInHTML = document.getElementById("hyrax-runner") as HTMLElement;
     if (!hyraxInHTML) throw new Error("hyrax-runner element not found");
 
-    hyraxInstance = new Hyrax(hyraxInHTML); // CHANGED from 'const hyrax' to 'hyraxInstance'
-
-    // setInterval(() => {
-    //   isCollision(hyraxInHTML);
-    // }, 1000);
+    hyraxInstance = new Hyrax(hyraxInHTML);
 
     document.addEventListener("keydown", (e: KeyboardEvent) => {
       if (e.code === "Space" || e.code === "ArrowUp") hyraxInstance.jump();
@@ -125,23 +131,26 @@ function animateBackground() {
     offset -= scrollSpeed;
     container.style.backgroundPositionX = `${offset}px`;
     requestAnimationFrame(animateBackground);
-  
   } catch (error) {
     console.error("animateBackground error: ", error);
   }
 }
+
 function updateCactus() {
   try {
-    if (!run) return; // ADDED THIS LINE
+    if (!run) return;
 
     const container = document.getElementById("game-container");
     if (!container) throw new Error("game-container element not found");
     const frames = container.clientWidth / scrollSpeed;
+
     setInterval(() => {
       const a = Math.floor(Math.random() * 10) * 50;
       setTimeout(() => {
         const cactus = new Cactus();
-        cactus.htmlElement.style.animation = `cactus-movement ${frames / 60}s linear forwards`;
+        cactus.htmlElement.style.animation = `cactus-movement ${
+          frames / 60
+        }s linear forwards`;
         setTimeout(() => {
           if (cactus.htmlElement && cactus.htmlElement.parentNode) {
             cactus.htmlElement.parentNode.removeChild(cactus.htmlElement);
@@ -153,6 +162,7 @@ function updateCactus() {
     console.error("Error moving cactus: ", error);
   }
 }
+
 function startCollisionDetection() {
   try {
     const collisionInterval = setInterval(() => {
@@ -160,24 +170,23 @@ function startCollisionDetection() {
         clearInterval(collisionInterval);
         return;
       }
-
       const hyraxElement = document.getElementById("hyrax-runner");
       if (!hyraxElement) return;
-
-      isCollision(hyraxElement);
-    }, 10); // Check every 10ms for smooth collision detection
+      isCollision(hyraxElement as HTMLElement);
+    }, 10);
   } catch (error) {
     console.error("startCollisionDetection error: ", error);
   }
-}function isCollision(hyrax: HTMLElement) {
+}
+
+function isCollision(hyrax: HTMLElement) {
   try {
-    const cactusElements = document.querySelectorAll('.cactus');
+    const cactusElements = document.querySelectorAll(".cactus");
 
     cactusElements.forEach((cactusElement) => {
       const hyraxRect = hyrax.getBoundingClientRect();
       const cactusRect = cactusElement.getBoundingClientRect();
 
-      // Add some margin for more forgiving collision detection
       const margin = 10;
 
       const hyraxLeft = hyraxRect.left + margin;
@@ -190,11 +199,11 @@ function startCollisionDetection() {
       const cactusTop = cactusRect.top;
       const cactusBottom = cactusRect.bottom;
 
-      // Check if rectangles overlap
-      const isOverlapping = hyraxLeft < cactusRight &&
-                           hyraxRight > cactusLeft &&
-                           hyraxTop < cactusBottom &&
-                           hyraxBottom > cactusTop;
+      const isOverlapping =
+        hyraxLeft < cactusRight &&
+        hyraxRight > cactusLeft &&
+        hyraxTop < cactusBottom &&
+        hyraxBottom > cactusTop;
 
       if (isOverlapping && !hyraxInstance.isDead) {
         console.log("Collision detected!");

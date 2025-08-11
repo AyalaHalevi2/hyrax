@@ -11,14 +11,19 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+// index.ts
 var offset = 0;
-var jumpDuration = 250; //ms
+var jumpDuration = 500; // ms (smoother)
 var scrollSpeed = 4;
-var jumpHeight = 20; //
-var hyraxHeight = 30; //%
+var jumpHeight = 60; // px (higher)
+var hyraxHeight = 30; // %
 var run = true;
-var score = sessionStorage.getItem("score") ? JSON.parse(sessionStorage.getItem("score")) : 0;
-var maxScore = localStorage.getItem("maxscore") ? JSON.parse(localStorage.getItem("maxscore")) : 0;
+var score = sessionStorage.getItem("score")
+    ? JSON.parse(sessionStorage.getItem("score"))
+    : 0;
+var maxScore = localStorage.getItem("maxscore")
+    ? JSON.parse(localStorage.getItem("maxscore"))
+    : 0;
 var hyraxInstance;
 var Hyrax = /** @class */ (function () {
     function Hyrax(elment) {
@@ -34,28 +39,28 @@ var Hyrax = /** @class */ (function () {
         if (this.isJump)
             return;
         this.isJump = true;
+        // freeze current sprite frame during jump
         var computedStyle = window.getComputedStyle(this.htmlElement);
         var currentFrame = computedStyle.backgroundPositionX;
         this.htmlElement.style.animation = "none";
         this.htmlElement.style.backgroundPositionX = currentFrame;
-        this.htmlElement.style.animation = "jump 0.3s ease-in-out";
-        // setTimeout(() => {
-        //   this.htmlElement.style.transition = `bottom ${jumpDuration}ms ease-in`;
-        //   this.htmlElement.style.bottom = `${hyraxHeight}%`;
+        // pass vars to CSS so we can tune from TS
+        this.htmlElement.style.setProperty("--jump-peak", jumpHeight + "px");
+        this.htmlElement.style.setProperty("--jump-duration", jumpDuration + "ms");
+        // smooth jump motion
+        this.htmlElement.style.animation = "jump var(--jump-duration) cubic-bezier(0.2, 0.6, 0.2, 1)";
         setTimeout(function () {
-            _this.htmlElement.style.animation = "run-cycle 0.3s steps(4) infinite";
+            // resume run cycle
+            _this.htmlElement.style.animation = "run-cycle 0.45s steps(4) infinite";
             _this.isJump = false;
             console.log("after jumping: " + offset);
         }, jumpDuration);
     };
-    //   }, jumpDuration);
-    // }
     Hyrax.prototype.die = function () {
         this.isDead = true;
         run = false;
         this.htmlElement.style.animation = "none";
         console.log("Game Over! Score:", score);
-        // Update max score if current score is higher
         if (score > maxScore) {
             maxScore = score;
             localStorage.setItem("maxscore", JSON.stringify(maxScore));
@@ -87,7 +92,9 @@ var Cactus = /** @class */ (function (_super) {
             cactusContainer.appendChild(this.htmlElement);
             this.htmlElement = this.htmlElement;
         }
-        catch (error) { }
+        catch (error) {
+            console.error(error);
+        }
     };
     return Cactus;
 }(Obstacle));
@@ -95,14 +102,11 @@ window.addEventListener("DOMContentLoaded", function () {
     try {
         animateBackground();
         updateCactus();
-        startCollisionDetection(); // ADDED THIS LINE
+        startCollisionDetection();
         var hyraxInHTML = document.getElementById("hyrax-runner");
         if (!hyraxInHTML)
             throw new Error("hyrax-runner element not found");
-        hyraxInstance = new Hyrax(hyraxInHTML); // CHANGED from 'const hyrax' to 'hyraxInstance'
-        // setInterval(() => {
-        //   isCollision(hyraxInHTML);
-        // }, 1000);
+        hyraxInstance = new Hyrax(hyraxInHTML);
         document.addEventListener("keydown", function (e) {
             if (e.code === "Space" || e.code === "ArrowUp")
                 hyraxInstance.jump();
@@ -140,7 +144,7 @@ function animateBackground() {
 function updateCactus() {
     try {
         if (!run)
-            return; // ADDED THIS LINE
+            return;
         var container = document.getElementById("game-container");
         if (!container)
             throw new Error("game-container element not found");
@@ -173,7 +177,7 @@ function startCollisionDetection() {
             if (!hyraxElement)
                 return;
             isCollision(hyraxElement);
-        }, 10); // Check every 10ms for smooth collision detection
+        }, 10);
     }
     catch (error) {
         console.error("startCollisionDetection error: ", error);
@@ -181,11 +185,10 @@ function startCollisionDetection() {
 }
 function isCollision(hyrax) {
     try {
-        var cactusElements = document.querySelectorAll('.cactus');
+        var cactusElements = document.querySelectorAll(".cactus");
         cactusElements.forEach(function (cactusElement) {
             var hyraxRect = hyrax.getBoundingClientRect();
             var cactusRect = cactusElement.getBoundingClientRect();
-            // Add some margin for more forgiving collision detection
             var margin = 10;
             var hyraxLeft = hyraxRect.left + margin;
             var hyraxRight = hyraxRect.right - margin;
@@ -195,7 +198,6 @@ function isCollision(hyrax) {
             var cactusRight = cactusRect.right;
             var cactusTop = cactusRect.top;
             var cactusBottom = cactusRect.bottom;
-            // Check if rectangles overlap
             var isOverlapping = hyraxLeft < cactusRight &&
                 hyraxRight > cactusLeft &&
                 hyraxTop < cactusBottom &&
