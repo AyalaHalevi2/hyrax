@@ -58,7 +58,7 @@ body {
 }
 
 // Cactus styles
-#cactus {
+.cactus {
   position: absolute;
   bottom: 222px;
   width: 24px;
@@ -67,7 +67,14 @@ body {
   outline: 2px solid #1b5e20;
   image-rendering: pixelated;
 }
-
+@keyframes cactus-movement {
+  from {
+    right: -50px;
+  }
+  to {
+    right: 100vw;
+  }
+}
 // Game over overlay
 .game-over {
   position: absolute;

@@ -1,6 +1,6 @@
 // index.ts
 let offset = 0;
-const jumpDuration = 300  ; // ms (smoother)
+const jumpDuration = 300; // ms (smoother)
 const scrollSpeed = 4;
 const jumpHeight = 20; // px (higher)
 const hyraxHeight = 30; // %
@@ -38,7 +38,7 @@ class Hyrax {
     const currentFrame = computedStyle.backgroundPositionX;
     this.htmlElement.style.animation = "none";
     this.htmlElement.style.backgroundPositionX = currentFrame;
-      this.htmlElement.style.transition = `bottom ${jumpDuration}ms ease-out`;
+    this.htmlElement.style.transition = `bottom ${jumpDuration}ms ease-out`;
     this.htmlElement.style.bottom = `${hyraxHeight + jumpHeight}%`;
 
     // this.htmlElement.style.animation = "jump 0.3s ease-in-out";
@@ -46,12 +46,11 @@ class Hyrax {
       this.htmlElement.style.transition = `bottom ${jumpDuration}ms ease-in`;
       this.htmlElement.style.bottom = `${hyraxHeight}%`;
 
-    setTimeout(() => {
-      this.htmlElement.style.animation = "run-cycle 0.3s steps(4) infinite";
-      this.isJump = false;
-      console.log("after jumping: " + offset);
-    }, jumpDuration);
-
+      setTimeout(() => {
+        this.htmlElement.style.animation = "run-cycle 0.3s steps(4) infinite";
+        this.isJump = false;
+        console.log("after jumping: " + offset);
+      }, jumpDuration);
     }, jumpDuration);
   }
 
@@ -146,7 +145,9 @@ function updateCactus() {
     const frames = container.clientWidth / scrollSpeed;
 
     setInterval(() => {
-      const a = Math.floor(Math.random() * 10) * 50;
+      const possibleDelays = [100, 400, 700, 1000, 1500, 2000];
+      const a =
+        possibleDelays[Math.floor(Math.random() * possibleDelays.length)];
       setTimeout(() => {
         const cactus = new Cactus();
         cactus.htmlElement.style.animation = `cactus-movement ${

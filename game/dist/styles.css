@@ -48,7 +48,7 @@ body {
     background-position: -424px 0;
   }
 }
-#cactus {
+.cactus {
   position: absolute;
   bottom: 222px;
   width: 24px;
@@ -58,6 +58,14 @@ body {
   image-rendering: pixelated;
 }
 
+@keyframes cactus-movement {
+  from {
+    right: -50px;
+  }
+  to {
+    right: 100vw;
+  }
+}
 .game-over {
   position: absolute;
   inset: 0;

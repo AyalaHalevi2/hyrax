@@ -151,7 +151,8 @@ function updateCactus() {
             throw new Error("game-container element not found");
         var frames_1 = container.clientWidth / scrollSpeed;
         setInterval(function () {
-            var a = Math.floor(Math.random() * 10) * 50;
+            var possibleDelays = [100, 400, 700, 1000, 1500, 2000];
+            var a = possibleDelays[Math.floor(Math.random() * possibleDelays.length)];
             setTimeout(function () {
                 var cactus = new Cactus();
                 cactus.htmlElement.style.animation = "cactus-movement " + frames_1 / 60 + "s linear forwards";
