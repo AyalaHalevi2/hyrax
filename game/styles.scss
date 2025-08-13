@@ -1,88 +1,92 @@
-:root {
-  font-size: 17px;
-  font-family: "Pixelify Sans", sans-serif;
-}
+@charset "UTF-8";
 
 body {
   margin: 0;
   padding: 0;
   overflow: hidden;
+  background: black;
 }
 
 #game-container {
   width: 100vw;
-  height: 100vh;
-  background-image: url("../assets/forest\ -\ Copy.png");
+  height: 100dvh;
+  background-image: url(../assets/forest.png);
+  background-repeat: repeat-x;
   background-position: 0 0;
   background-size: auto 100%;
   image-rendering: pixelated;
   overflow: hidden;
-  transform: translateZ(0);
+  position: relative;
+  touch-action: none;
 }
 
 #hyrax-runner {
   position: absolute;
-  bottom: 30%;
-  left:20%;
-  transform: translateX(-50%);
-  width: 10vh;
-  height:8vh;
-  border: 2px solid;
-  background-image: url("../assets/hyrax_run.png");
+  bottom: 222px;
+  left: 50%;
+  margin-left: -53px;
+  transform: none;
+  width: 105px;
+  height: 80px;
+  background-image: url(../assets/new_run.png);
   background-repeat: no-repeat;
-  background-size: 458px 111px;
-  background-position-y: 0;
-  image-rendering: pixelated;
-  animation: run-cycle 0.4s steps(4) infinite;
+  background-size: 432px 80px;
+  background-position: 0 0;
 
+  image-rendering: pixelated;
+  backface-visibility: hidden;
+  will-change: background-position;
+
+  // Simple animation that works with steps()
+  animation: run-cycle 0.3s steps(4, end) infinite;
+
+  transition: none;
+
+  &.jumping {
+    animation: none !important;
+  }
 }
 
-
+// Simple keyframe animation
 @keyframes run-cycle {
   from {
-    background-position-x: 0;
+    background-position: 0 0;
   }
   to {
-    background-position-x: -448px;
+    background-position: -424px 0;
   }
 }
 
-.cactus {
+// Cactus styles
+#cactus {
   position: absolute;
-
-  height: 80px;
-  width: 65px;
-  // background-color: aqua;
-  // border-color: black;
-  border: 2cm;
-  bottom: 30%;
-  background-image: url(../assets/cactus.png);
-  background-size: auto 100%;
-  background-repeat: no-repeat;
-  border: 2px solid;
+  bottom: 222px;
+  width: 24px;
+  height: 40px;
+  background: #2e7d32;
+  outline: 2px solid #1b5e20;
+  image-rendering: pixelated;
 }
 
-@keyframes cactus-movement {
-  0% {
-    transform: translateX(104vw);
-  }
-  100% {
-    transform: translateX(-104vw);
-  }
-}
-
-.top {
+// Game over overlay
+.game-over {
+  position: absolute;
+  inset: 0;
   display: flex;
-  color: white;
-  height: 10vh;
-  // background-color: rgb(78, 51, 15);
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  padding: 0 10rem;
-  font-size: 3rem;
-}
-.score,
-.maxscore {
-  display: flex;
-  gap: 2rem;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-family: monospace;
+  font-size: 42px;
+  letter-spacing: 2px;
+  z-index: 9999;
+
+  small {
+    display: block;
+    font-size: 20px;
+    margin-top: 10px;
+    opacity: 0.9;
+  }
 }
