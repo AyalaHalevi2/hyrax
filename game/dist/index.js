@@ -12,19 +12,15 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 // index.ts
+//data
 var offset = 0;
-var jumpDuration = 300; // ms (smoother)
+var jumpDuration = 500; // ms (smoother)
 var scrollSpeed = 4;
 var jumpHeight = 20; // px (higher)
 var hyraxHeight = 30; // %
 var run = true;
-var score = sessionStorage.getItem("score")
-    ? JSON.parse(sessionStorage.getItem("score"))
-    : 0;
-var maxScore = localStorage.getItem("maxscore")
-    ? JSON.parse(localStorage.getItem("maxscore"))
-    : 0;
-var hyraxInstance;
+var score = sessionStorage.getItem("score") ? JSON.parse(sessionStorage.getItem("score")) : 0;
+var maxScore = localStorage.getItem("maxscore") ? JSON.parse(localStorage.getItem("maxscore")) : 0;
 var Hyrax = /** @class */ (function () {
     function Hyrax(elment) {
         this.htmlElement = elment;
@@ -53,7 +49,6 @@ var Hyrax = /** @class */ (function () {
             setTimeout(function () {
                 _this.htmlElement.style.animation = "run-cycle 0.3s steps(4) infinite";
                 _this.isJump = false;
-                console.log("after jumping: " + offset);
             }, jumpDuration);
         }, jumpDuration);
     };
@@ -99,18 +94,22 @@ var Cactus = /** @class */ (function (_super) {
     };
     return Cactus;
 }(Obstacle));
+//control functions
 window.addEventListener("DOMContentLoaded", function () {
     try {
-        animateBackground();
-        updateCactus();
-        startCollisionDetection();
+        var container = document.getElementById("game-container");
+        if (!container)
+            throw new Error("game-container element not found");
+        animateBackground(container);
+        updateCactus(container);
         var hyraxInHTML = document.getElementById("hyrax-runner");
         if (!hyraxInHTML)
             throw new Error("hyrax-runner element not found");
-        hyraxInstance = new Hyrax(hyraxInHTML);
+        var hyrax_1 = new Hyrax(hyraxInHTML);
+        startCollisionDetection(hyrax_1, container);
         document.addEventListener("keydown", function (e) {
             if (e.code === "Space" || e.code === "ArrowUp")
-                hyraxInstance.jump();
+                hyrax_1.jump();
         });
     }
     catch (error) {
@@ -129,26 +128,20 @@ function renderScore() {
         console.error("renderScore error: ", error);
     }
 }
-function animateBackground() {
+function animateBackground(container) {
     try {
-        var container = document.getElementById("game-container");
-        if (!container)
-            throw new Error("game-container element not found");
         offset -= scrollSpeed;
         container.style.backgroundPositionX = offset + "px";
-        requestAnimationFrame(animateBackground);
+        requestAnimationFrame(function () { return animateBackground(container); });
     }
     catch (error) {
         console.error("animateBackground error: ", error);
     }
 }
-function updateCactus() {
+function updateCactus(container) {
     try {
         if (!run)
             return;
-        var container = document.getElementById("game-container");
-        if (!container)
-            throw new Error("game-container element not found");
         var frames_1 = container.clientWidth / scrollSpeed;
         setInterval(function () {
             var possibleDelays = [100, 400, 700, 1000, 1500, 2000];
@@ -162,13 +155,13 @@ function updateCactus() {
                     }
                 }, (frames_1 / 60) * 1000);
             }, a);
-        }, 1000);
+        }, 3000);
     }
     catch (error) {
         console.error("Error moving cactus: ", error);
     }
 }
-function startCollisionDetection() {
+function startCollisionDetection(hyrax, container) {
     try {
         var collisionInterval_1 = setInterval(function () {
             if (!run) {
@@ -178,35 +171,50 @@ function startCollisionDetection() {
             var hyraxElement = document.getElementById("hyrax-runner");
             if (!hyraxElement)
                 return;
-            isCollision(hyraxElement);
+            isCollision(hyrax, container);
         }, 10);
     }
     catch (error) {
         console.error("startCollisionDetection error: ", error);
     }
 }
-function isCollision(hyrax) {
+function isCollision(hyrax, container) {
     try {
-        var cactusElements = document.querySelectorAll(".cactus");
-        cactusElements.forEach(function (cactusElement) {
-            var hyraxRect = hyrax.getBoundingClientRect();
+        var cactusElements_1 = document.querySelectorAll(".cactus");
+        if (!cactusElements_1)
+            throw new Error("no cactus class element");
+        var hyraxRect_1 = hyrax.htmlElement.getBoundingClientRect();
+        cactusElements_1.forEach(function (cactusElement) {
             var cactusRect = cactusElement.getBoundingClientRect();
             var margin = 10;
-            var hyraxLeft = hyraxRect.left + margin;
-            var hyraxRight = hyraxRect.right - margin;
-            var hyraxTop = hyraxRect.top + margin;
-            var hyraxBottom = hyraxRect.bottom - margin;
+            var hyraxLeft = hyraxRect_1.left + margin;
+            var hyraxRight = hyraxRect_1.right - margin;
+            var hyraxTop = hyraxRect_1.top + margin;
+            var hyraxBottom = hyraxRect_1.bottom - margin;
             var cactusLeft = cactusRect.left;
             var cactusRight = cactusRect.right;
             var cactusTop = cactusRect.top;
             var cactusBottom = cactusRect.bottom;
-            var isOverlapping = hyraxLeft < cactusRight &&
-                hyraxRight > cactusLeft &&
-                hyraxTop < cactusBottom &&
-                hyraxBottom > cactusTop;
-            if (isOverlapping && !hyraxInstance.isDead) {
+            var isOverlapping = hyraxLeft < cactusRight && hyraxRight > cactusLeft && hyraxTop < cactusBottom && hyraxBottom > cactusTop;
+            var hyraxCenter = hyraxRect_1.left + hyraxRect_1.width / 2;
+            var cactusCenter = cactusRect.left + cactusRect.width / 2;
+            if (hyraxCenter > cactusCenter && !isOverlapping && hyrax.isJump) {
+                setTimeout(function () {
+                    score += 100; // Award 100 points for successful jump
+                    renderScore();
+                });
+                console.log("Successful jump! +100 points");
+            }
+            if (isOverlapping && !hyrax.isDead) {
                 console.log("Collision detected!");
-                hyraxInstance.die();
+                hyrax.die();
+                hyrax.htmlElement.style.animation = "none";
+                offset = 0;
+                container.style.animation = "none";
+                cactusElements_1.forEach(function (cactus) {
+                    cactus.style.animation = "none";
+                    cactus.style.animationPlayState = "paused";
+                });
                 return;
             }
         });
