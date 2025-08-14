@@ -7,7 +7,7 @@ body {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background: black;
+  background-color: black;
 }
 
 #game-container {
@@ -19,8 +19,6 @@ body {
   background-size: auto 100%;
   image-rendering: pixelated;
   overflow: hidden;
-  position: relative;
-  touch-action: none;
 }
 
 #hyrax-runner {
@@ -40,9 +38,6 @@ body {
   will-change: background-position;
   animation: run-cycle 0.3s steps(4, end) infinite;
   transition: none;
-}
-#hyrax-runner.jumping {
-  animation: none !important;
 }
 
 @keyframes run-cycle {
@@ -71,27 +66,6 @@ body {
     right: 100vw;
   }
 }
-.game-over {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.55);
-  color: #fff;
-  font-family: monospace;
-  font-size: 42px;
-  letter-spacing: 2px;
-  z-index: 9999;
-}
-.game-over small {
-  display: block;
-  font-size: 20px;
-  margin-top: 10px;
-  opacity: 0.9;
-}
-
 .top {
   display: flex;
   color: white;
@@ -106,4 +80,24 @@ body {
 .maxscore {
   display: flex;
   gap: 2rem;
+}
+
+#game-over {
+  position: fixed;
+  display: none;
+  flex-direction: column;
+  gap: 7rem;
+  padding: 5rem;
+  font-size: 3rem;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid wheat;
+  z-index: 1000;
+  color: white;
+  font-size: 3rem;
+  background-color: black;
+}
+#game-over .score {
+  color: white;
 }

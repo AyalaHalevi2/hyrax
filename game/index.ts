@@ -22,11 +22,12 @@ class Hyrax {
     this.isJump = false;
     this.isSlide = false;
     this.score = 0;
+    renderScore(this);
   }
   //model
   jump() {
-    if (this.isJump||!run) return;
-        this.isJump = true;
+    if (this.isJump || !run) return;
+    this.isJump = true;
     // freeze current sprite frame during jump
     const computedStyle = window.getComputedStyle(this.htmlElement);
     const currentFrame = computedStyle.backgroundPositionX;
@@ -67,7 +68,7 @@ class Cactus extends Obstacle {
   //view
   renderCactus() {
     try {
-      if(!run) return;
+      if (!run) return;
       const cactusContainer = document.getElementById("cactusRoot");
       if (!cactusContainer) throw new Error("cactusRoot element not found");
       this.htmlElement = document.createElement("div");
@@ -113,11 +114,13 @@ function updateCactus(container: HTMLElement) {
   try {
     const frames = container.clientWidth / scrollSpeed;
     const addCactusInterval = setInterval(() => {
-      if (!run) clearInterval(addCactusInterval);
+      if (!run) {
+        clearInterval(addCactusInterval);
+        return;
+      }
       const rendonAdditionalTime = Math.floor(Math.random() * 5) * 50;
       setTimeout(() => {
         const cactus = new Cactus();
-
         cactus.htmlElement.style.animation = `cactus-movement ${frames / 60}s linear forwards`;
         setTimeout(() => {
           if (cactus.htmlElement && cactus.htmlElement.parentNode) {
@@ -168,20 +171,17 @@ function isCollision(hyrax: Hyrax, container: HTMLElement) {
       const hyraxCenter = hyraxRect.left + hyraxRect.width / 2;
       const cactusCenter = cactusRect.left + cactusRect.width / 2;
       if (hyraxCenter > cactusCenter && !isOverlapping && hyrax.isJump) {
-        setTimeout(() => {
-          hyrax.score += 100; // Award 100 points for successful jump
-          renderScore(hyrax);
-        }, jumpDuration + 2000);
-
+        hyrax.score += 100; // Award 100 points for successful jump
+        renderScore(hyrax);
         console.log("Successful jump! +100 points");
       }
       if (isOverlapping && !hyrax.isDead) {
         console.log("Collision detected!");
         run = false;
         gameOver(hyrax, container);
+        cactusElements.forEach((cactus) => cactus.remove());
         return;
       }
-      return;
     });
   } catch (error) {
     console.error("isCollision error: ", error);
@@ -215,6 +215,5 @@ function gameOver(hyrax: Hyrax, container: HTMLElement) {
     }
   } catch (error) {
     console.error(error);
-
   }
 }
