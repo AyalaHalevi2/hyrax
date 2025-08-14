@@ -1,12 +1,12 @@
 // index.ts
 //data
 let offset = 0;
-const jumpDuration = 300; // ms (smoother)
+const jumpDuration = 400; // ms (smoother)
 const scrollSpeed = 4;
-const jumpHeight = 20; // px (higher)
+const jumpHeight = 30; // px (higher)
 const hyraxHeight = 30; // %
 let run = true;
-let score = sessionStorage.getItem("score") ? JSON.parse(sessionStorage.getItem("score")!) : 0;
+
 let maxScore = localStorage.getItem("maxscore") ? JSON.parse(localStorage.getItem("maxscore")!) : 0;
 
 class Hyrax {
@@ -20,13 +20,13 @@ class Hyrax {
     this.htmlElement = elment;
     this.position = { x: 0, y: 0 };
     this.isJump = false;
-    this.isDead = false;
     this.isSlide = false;
     this.score = 0;
   }
+  //model
   jump() {
-    if (this.isJump) return;
-    this.isJump = true;
+    if (this.isJump||!run) return;
+        this.isJump = true;
     // freeze current sprite frame during jump
     const computedStyle = window.getComputedStyle(this.htmlElement);
     const currentFrame = computedStyle.backgroundPositionX;
@@ -47,19 +47,9 @@ class Hyrax {
       }, jumpDuration);
     }, jumpDuration);
   }
-
-  die() {
-    this.isDead = true;
-    run = false;
-    this.htmlElement.style.animation = "none";
-    console.log("Game Over! Score:", score);
-    if (score > maxScore) {
-      maxScore = score;
-      localStorage.setItem("maxscore", JSON.stringify(maxScore));
-    }
-  }
+  //model
 }
-
+//data
 class Obstacle {
   htmlElement: HTMLElement;
   position: { x: number; y: number };
@@ -74,8 +64,10 @@ class Cactus extends Obstacle {
     this.position.y = 30;
     this.renderCactus();
   }
+  //view
   renderCactus() {
     try {
+      if(!run) return;
       const cactusContainer = document.getElementById("cactusRoot");
       if (!cactusContainer) throw new Error("cactusRoot element not found");
       this.htmlElement = document.createElement("div");
@@ -85,6 +77,17 @@ class Cactus extends Obstacle {
     } catch (error) {
       console.error(error);
     }
+  }
+}
+//view
+function renderScore(hyrax: Hyrax) {
+  try {
+    const scoreinhtml = document.getElementById("scoreRoot");
+    if (!scoreinhtml) throw new Error("scoreRoot not found");
+    sessionStorage.setItem("score", JSON.stringify(hyrax.score));
+    scoreinhtml.innerHTML = hyrax.score.toString();
+  } catch (error) {
+    console.error("renderScore error: ", error);
   }
 }
 //control functions
@@ -106,47 +109,23 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-function renderScore() {
-  try {
-    const scoreinhtml = document.getElementById("scoreRoot");
-    if (!scoreinhtml) throw new Error("scoreRoot not found");
-    sessionStorage.setItem("score", JSON.stringify(score));
-    scoreinhtml.innerHTML = score.toString();
-  } catch (error) {
-    console.error("renderScore error: ", error);
-  }
-}
-
-function animateBackground(container: HTMLElement) {
-  try {
-    offset -= scrollSpeed;
-    container.style.backgroundPositionX = `${offset}px`;
-    requestAnimationFrame(() => animateBackground(container));
-  } catch (error) {
-    console.error("animateBackground error: ", error);
-  }
-}
-
 function updateCactus(container: HTMLElement) {
   try {
-    if (!run) return;
-
     const frames = container.clientWidth / scrollSpeed;
-
-    setInterval(() => {
-      const possibleDelays = [100, 400, 700, 1000, 1500, 2000];
-      const a =
-        possibleDelays[Math.floor(Math.random() * possibleDelays.length)];
+    const addCactusInterval = setInterval(() => {
+      if (!run) clearInterval(addCactusInterval);
+      const rendonAdditionalTime = Math.floor(Math.random() * 5) * 50;
       setTimeout(() => {
         const cactus = new Cactus();
+
         cactus.htmlElement.style.animation = `cactus-movement ${frames / 60}s linear forwards`;
         setTimeout(() => {
           if (cactus.htmlElement && cactus.htmlElement.parentNode) {
             cactus.htmlElement.parentNode.removeChild(cactus.htmlElement);
           }
         }, (frames / 60) * 1000);
-      }, a);
-    }, 3000);
+      }, rendonAdditionalTime);
+    }, 2500);
   } catch (error) {
     console.error("Error moving cactus: ", error);
   }
@@ -167,12 +146,11 @@ function startCollisionDetection(hyrax: Hyrax, container: HTMLElement) {
     console.error("startCollisionDetection error: ", error);
   }
 }
-
+//control
 function isCollision(hyrax: Hyrax, container: HTMLElement) {
   try {
     const cactusElements = document.querySelectorAll(".cactus");
     if (!cactusElements) throw new Error("no cactus class element");
-
     const hyraxRect = hyrax.htmlElement.getBoundingClientRect();
     cactusElements.forEach((cactusElement) => {
       const cactusRect = cactusElement.getBoundingClientRect();
@@ -190,25 +168,53 @@ function isCollision(hyrax: Hyrax, container: HTMLElement) {
       const hyraxCenter = hyraxRect.left + hyraxRect.width / 2;
       const cactusCenter = cactusRect.left + cactusRect.width / 2;
       if (hyraxCenter > cactusCenter && !isOverlapping && hyrax.isJump) {
-        setTimeout(()=>{score += 100; // Award 100 points for successful jump
-        renderScore();})
+        setTimeout(() => {
+          hyrax.score += 100; // Award 100 points for successful jump
+          renderScore(hyrax);
+        }, jumpDuration + 2000);
 
         console.log("Successful jump! +100 points");
       }
       if (isOverlapping && !hyrax.isDead) {
         console.log("Collision detected!");
-        hyrax.die();
-        hyrax.htmlElement.style.animation = "none";
-        offset = 0
-        container.style.animation = "none";
-        cactusElements.forEach((cactus) => {
-          (cactus as HTMLElement).style.animation = "none";
-          (cactus as HTMLElement).style.animationPlayState = "paused";
-        });
+        run = false;
+        gameOver(hyrax, container);
         return;
       }
+      return;
     });
   } catch (error) {
     console.error("isCollision error: ", error);
+  }
+}
+
+//model
+function animateBackground(container: HTMLElement) {
+  try {
+    if (!run) return;
+    offset -= scrollSpeed;
+    container.style.backgroundPositionX = `${offset}px`;
+    requestAnimationFrame(() => animateBackground(container));
+  } catch (error) {
+    console.error("animateBackground error: ", error);
+  }
+}
+function gameOver(hyrax: Hyrax, container: HTMLElement) {
+  try {
+    offset = 0;
+    hyrax.htmlElement.style.animation = "none";
+    container.style.animation = "none";
+    console.log("Game Over! Score:", this.score);
+    container.style.opacity = "20%";
+    const gameOverDiv = document.getElementById("game-over");
+    if (!gameOverDiv) throw new Error("game-over element not found");
+    gameOverDiv.style.display = "flex";
+    if (this.score > maxScore) {
+      maxScore = this.score;
+      localStorage.setItem("maxscore", JSON.stringify(maxScore));
+    }
+  } catch (error) {
+    console.error(error);
+
   }
 }

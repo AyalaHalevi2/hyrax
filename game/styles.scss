@@ -1,5 +1,8 @@
 @charset "UTF-8";
-
+:root {
+  font-size: 17px;
+  font-family: "Pixelify Sans", sans-serif;
+}
 body {
   margin: 0;
   padding: 0;
@@ -22,8 +25,8 @@ body {
 
 #hyrax-runner {
   position: absolute;
-  bottom: 222px;
-  left: 50%;
+  bottom: 30%;
+  left: 20%;
   margin-left: -53px;
   transform: none;
   width: 105px;
@@ -60,7 +63,7 @@ body {
 // Cactus styles
 .cactus {
   position: absolute;
-  bottom: 222px;
+  bottom: 30%;
   width: 24px;
   height: 40px;
   background: #2e7d32;
@@ -97,3 +100,21 @@ body {
     opacity: 0.9;
   }
 }
+
+
+.top {
+  display: flex;
+  color: white;
+  height: 10vh;
+  // background-color: rgb(78, 51, 15);
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10rem;
+  font-size: 3rem;
+}
+.score,
+.maxscore {
+  display: flex;
+  gap: 2rem;
+}
+

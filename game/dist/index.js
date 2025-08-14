@@ -14,25 +14,24 @@ var __extends = (this && this.__extends) || (function () {
 // index.ts
 //data
 var offset = 0;
-var jumpDuration = 500; // ms (smoother)
+var jumpDuration = 400; // ms (smoother)
 var scrollSpeed = 4;
-var jumpHeight = 20; // px (higher)
+var jumpHeight = 30; // px (higher)
 var hyraxHeight = 30; // %
 var run = true;
-var score = sessionStorage.getItem("score") ? JSON.parse(sessionStorage.getItem("score")) : 0;
 var maxScore = localStorage.getItem("maxscore") ? JSON.parse(localStorage.getItem("maxscore")) : 0;
 var Hyrax = /** @class */ (function () {
     function Hyrax(elment) {
         this.htmlElement = elment;
         this.position = { x: 0, y: 0 };
         this.isJump = false;
-        this.isDead = false;
         this.isSlide = false;
         this.score = 0;
     }
+    //model
     Hyrax.prototype.jump = function () {
         var _this = this;
-        if (this.isJump)
+        if (this.isJump || !run)
             return;
         this.isJump = true;
         // freeze current sprite frame during jump
@@ -49,21 +48,13 @@ var Hyrax = /** @class */ (function () {
             setTimeout(function () {
                 _this.htmlElement.style.animation = "run-cycle 0.3s steps(4) infinite";
                 _this.isJump = false;
+                console.log("after jumping: " + offset);
             }, jumpDuration);
         }, jumpDuration);
     };
-    Hyrax.prototype.die = function () {
-        this.isDead = true;
-        run = false;
-        this.htmlElement.style.animation = "none";
-        console.log("Game Over! Score:", score);
-        if (score > maxScore) {
-            maxScore = score;
-            localStorage.setItem("maxscore", JSON.stringify(maxScore));
-        }
-    };
     return Hyrax;
 }());
+//data
 var Obstacle = /** @class */ (function () {
     function Obstacle() {
         this.position = { x: 0, y: 0 };
@@ -78,8 +69,11 @@ var Cactus = /** @class */ (function (_super) {
         _this.renderCactus();
         return _this;
     }
+    //view
     Cactus.prototype.renderCactus = function () {
         try {
+            if (!run)
+                return;
             var cactusContainer = document.getElementById("cactusRoot");
             if (!cactusContainer)
                 throw new Error("cactusRoot element not found");
@@ -94,6 +88,19 @@ var Cactus = /** @class */ (function (_super) {
     };
     return Cactus;
 }(Obstacle));
+//view
+function renderScore(hyrax) {
+    try {
+        var scoreinhtml = document.getElementById("scoreRoot");
+        if (!scoreinhtml)
+            throw new Error("scoreRoot not found");
+        sessionStorage.setItem("score", JSON.stringify(hyrax.score));
+        scoreinhtml.innerHTML = hyrax.score.toString();
+    }
+    catch (error) {
+        console.error("renderScore error: ", error);
+    }
+}
 //control functions
 window.addEventListener("DOMContentLoaded", function () {
     try {
@@ -116,36 +123,13 @@ window.addEventListener("DOMContentLoaded", function () {
         console.error("Event error: ", error);
     }
 });
-function renderScore() {
-    try {
-        var scoreinhtml = document.getElementById("scoreRoot");
-        if (!scoreinhtml)
-            throw new Error("scoreRoot not found");
-        sessionStorage.setItem("score", JSON.stringify(score));
-        scoreinhtml.innerHTML = score.toString();
-    }
-    catch (error) {
-        console.error("renderScore error: ", error);
-    }
-}
-function animateBackground(container) {
-    try {
-        offset -= scrollSpeed;
-        container.style.backgroundPositionX = offset + "px";
-        requestAnimationFrame(function () { return animateBackground(container); });
-    }
-    catch (error) {
-        console.error("animateBackground error: ", error);
-    }
-}
 function updateCactus(container) {
     try {
-        if (!run)
-            return;
         var frames_1 = container.clientWidth / scrollSpeed;
-        setInterval(function () {
-            var possibleDelays = [100, 400, 700, 1000, 1500, 2000];
-            var a = possibleDelays[Math.floor(Math.random() * possibleDelays.length)];
+        var addCactusInterval_1 = setInterval(function () {
+            if (!run)
+                clearInterval(addCactusInterval_1);
+            var rendonAdditionalTime = Math.floor(Math.random() * 5) * 50;
             setTimeout(function () {
                 var cactus = new Cactus();
                 cactus.htmlElement.style.animation = "cactus-movement " + frames_1 / 60 + "s linear forwards";
@@ -154,8 +138,8 @@ function updateCactus(container) {
                         cactus.htmlElement.parentNode.removeChild(cactus.htmlElement);
                     }
                 }, (frames_1 / 60) * 1000);
-            }, a);
-        }, 3000);
+            }, rendonAdditionalTime);
+        }, 2500);
     }
     catch (error) {
         console.error("Error moving cactus: ", error);
@@ -178,13 +162,14 @@ function startCollisionDetection(hyrax, container) {
         console.error("startCollisionDetection error: ", error);
     }
 }
+//control
 function isCollision(hyrax, container) {
     try {
-        var cactusElements_1 = document.querySelectorAll(".cactus");
-        if (!cactusElements_1)
+        var cactusElements = document.querySelectorAll(".cactus");
+        if (!cactusElements)
             throw new Error("no cactus class element");
         var hyraxRect_1 = hyrax.htmlElement.getBoundingClientRect();
-        cactusElements_1.forEach(function (cactusElement) {
+        cactusElements.forEach(function (cactusElement) {
             var cactusRect = cactusElement.getBoundingClientRect();
             var margin = 10;
             var hyraxLeft = hyraxRect_1.left + margin;
@@ -200,26 +185,54 @@ function isCollision(hyrax, container) {
             var cactusCenter = cactusRect.left + cactusRect.width / 2;
             if (hyraxCenter > cactusCenter && !isOverlapping && hyrax.isJump) {
                 setTimeout(function () {
-                    score += 100; // Award 100 points for successful jump
-                    renderScore();
-                });
+                    hyrax.score += 100; // Award 100 points for successful jump
+                    renderScore(hyrax);
+                }, jumpDuration + 2000);
                 console.log("Successful jump! +100 points");
             }
             if (isOverlapping && !hyrax.isDead) {
                 console.log("Collision detected!");
-                hyrax.die();
-                hyrax.htmlElement.style.animation = "none";
-                offset = 0;
-                container.style.animation = "none";
-                cactusElements_1.forEach(function (cactus) {
-                    cactus.style.animation = "none";
-                    cactus.style.animationPlayState = "paused";
-                });
+                run = false;
+                gameOver(hyrax, container);
                 return;
             }
+            return;
         });
     }
     catch (error) {
         console.error("isCollision error: ", error);
+    }
+}
+//model
+function animateBackground(container) {
+    try {
+        if (!run)
+            return;
+        offset -= scrollSpeed;
+        container.style.backgroundPositionX = offset + "px";
+        requestAnimationFrame(function () { return animateBackground(container); });
+    }
+    catch (error) {
+        console.error("animateBackground error: ", error);
+    }
+}
+function gameOver(hyrax, container) {
+    try {
+        offset = 0;
+        hyrax.htmlElement.style.animation = "none";
+        container.style.animation = "none";
+        console.log("Game Over! Score:", this.score);
+        container.style.opacity = "20%";
+        var gameOverDiv = document.getElementById("game-over");
+        if (!gameOverDiv)
+            throw new Error("game-over element not found");
+        gameOverDiv.style.display = "flex";
+        if (this.score > maxScore) {
+            maxScore = this.score;
+            localStorage.setItem("maxscore", JSON.stringify(maxScore));
+        }
+    }
+    catch (error) {
+        console.error(error);
     }
 }
