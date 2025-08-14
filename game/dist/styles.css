@@ -51,10 +51,9 @@ body {
 .cactus {
   position: absolute;
   bottom: 30%;
-  width: 80px;
-  height: 100px;
-  outline: 2px solid #1b5e20;
-  background-image: url(./assets/cactus3.png);
+  width: 70px;
+  height: 90px;
+  background-image: url(../assets/cactus3.png);
   background-size: 100% 100%;
   background-repeat: no-repeat;
   image-rendering: pixelated;
