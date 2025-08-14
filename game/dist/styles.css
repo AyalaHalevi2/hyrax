@@ -51,10 +51,12 @@ body {
 .cactus {
   position: absolute;
   bottom: 30%;
-  width: 24px;
-  height: 40px;
-  background: #2e7d32;
+  width: 80px;
+  height: 100px;
   outline: 2px solid #1b5e20;
+  background-image: url(./assets/cactus3.png);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
   image-rendering: pixelated;
 }
 
@@ -83,15 +85,15 @@ body {
 }
 
 #game-over {
-  position: fixed;
+  position: absolute;
   display: none;
   flex-direction: column;
-  gap: 4rem;
+  gap: 2rem;
   padding: 4.5rem;
   font-size: 3rem;
-  top: 20%;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
   border: 5px solid wheat;
   z-index: 1000;
   color: white;
@@ -99,14 +101,16 @@ body {
   background-color: black;
   border-radius: 10px;
   align-items: center;
+  max-height: 70vh;
 }
-#game-over .score {
+#game-over .score,
+#game-over .maxscore {
   font-size: 3rem;
-  color: white;
 }
-#game-over #restart {
+#game-over #restartBtn {
+  margin: 1rem;
   font-size: 2.5rem;
-  font-weight: 700;
+  font-weight: 900;
   padding: 1rem 2.5rem;
   color: black;
   font-family: inherit;
@@ -114,7 +118,7 @@ body {
   border: none;
   background-color: #fcfcfc;
 }
-#game-over #restart:hover {
+#game-over #restartBtn:hover {
   cursor: pointer;
   background-color: #cecece;
 }

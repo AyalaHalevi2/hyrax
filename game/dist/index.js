@@ -12,26 +12,21 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var offset = 0;
-var jumpDuration = 400;
+var jumpDuration = 500;
 var scrollSpeed = 4;
-var jumpHeight = 30;
+var jumpHeight = 35;
 var hyraxHeight = 30;
 var run = true;
-var maxScore = localStorage.getItem("maxscore")
-    ? JSON.parse(localStorage.getItem("maxscore"))
-    : 0;
-// ADDED: keep references so we can restart without reloading the page
-var hyraxRef = null; // reason: needed by restart to reset score/animation
-var containerRef = null; // reason: needed by restart to re-run loops
+var maxScore = localStorage.getItem("maxscore") ? JSON.parse(localStorage.getItem("maxscore")) : 0;
 var Hyrax = /** @class */ (function () {
     function Hyrax(elment) {
         this.htmlElement = elment;
         this.position = { x: 0, y: 0 };
         this.isJump = false;
         this.isSlide = false;
-        this.isDead = false; // CHANGED: explicitly initialize; reason: used during restart/collision
         this.score = 0;
         renderScore(this);
+        renderMaxScore();
     }
     //model
     Hyrax.prototype.jump = function () {
@@ -52,7 +47,6 @@ var Hyrax = /** @class */ (function () {
             setTimeout(function () {
                 _this.htmlElement.style.animation = "run-cycle 0.3s steps(4) infinite";
                 _this.isJump = false;
-                console.log("after jumping: " + offset);
             }, jumpDuration);
         }, jumpDuration);
     };
@@ -105,53 +99,19 @@ function renderScore(hyrax) {
         console.error("renderScore error: ", error);
     }
 }
-// ADDED: render max score in both the top bar and the game-over overlay
 function renderMaxScore() {
     try {
-        var topMax = document.getElementById("maxscoreRoot");
-        if (topMax)
-            topMax.textContent = String(maxScore); // reason: keep top bar always showing current max
-        var overlayMax = document.getElementById("maxscoreOverlay");
-        if (overlayMax)
-            overlayMax.textContent = String(maxScore); // reason: replace placeholder with real max score
+        var maxscoreinhtml = document.getElementById("maxscoreRoot");
+        if (!maxscoreinhtml)
+            throw new Error("maxscoreRoot not found");
+        sessionStorage.setItem("maxscore", JSON.stringify(maxScore));
+        maxscoreinhtml.innerHTML = maxScore.toString();
     }
     catch (error) {
-        console.error("renderMaxScore error: ", error);
+        console.error("renderScore error: ", error);
     }
 }
-//control functions
-window.addEventListener("DOMContentLoaded", function () {
-    try {
-        var container = document.getElementById("game-container");
-        if (!container)
-            throw new Error("game-container element not found");
-        containerRef = container; // ADDED: save for restart
-        animateBackground(container);
-        updateCactus(container);
-        var hyraxInHTML = document.getElementById("hyrax-runner");
-        if (!hyraxInHTML)
-            throw new Error("hyrax-runner element not found");
-        var hyrax_1 = new Hyrax(hyraxInHTML);
-        hyraxRef = hyrax_1; // ADDED: save for restart
-        startCollisionDetection(hyrax_1, container);
-        document.addEventListener("keydown", function (e) {
-            if (e.code === "Space" || e.code === "ArrowUp")
-                hyrax_1.jump();
-        });
-        renderMaxScore(); // ADDED: show max on initial load
-        // ADDED: hook up restart button to reset state and resume loops
-        var restartBtn = document.getElementById("restartBtn");
-        if (restartBtn) {
-            restartBtn.addEventListener("click", function () {
-                // reason: user requested a restart button that restarts the game
-                restartGame();
-            });
-        }
-    }
-    catch (error) {
-        console.error("Event error: ", error);
-    }
-});
+//view
 function updateCactus(container) {
     try {
         var frames_1 = container.clientWidth / scrollSpeed;
@@ -160,7 +120,7 @@ function updateCactus(container) {
                 clearInterval(addCactusInterval_1);
                 return;
             }
-            var rendonAdditionalTime = Math.floor(Math.random() * 5) * 50;
+            var rendonAdditionalTime = 2 + (Math.floor(Math.random() * 7) / 2) * 300;
             setTimeout(function () {
                 var cactus = new Cactus();
                 cactus.htmlElement.style.animation = "cactus-movement " + frames_1 / 60 + "s linear forwards";
@@ -170,12 +130,42 @@ function updateCactus(container) {
                     }
                 }, (frames_1 / 60) * 1000);
             }, rendonAdditionalTime);
-        }, 2500);
+        }, scrollSpeed * 450);
     }
     catch (error) {
         console.error("Error moving cactus: ", error);
     }
 }
+//control functions
+window.addEventListener("DOMContentLoaded", function () {
+    try {
+        var container_1 = document.getElementById("game-container");
+        if (!container_1)
+            throw new Error("game-container element not found");
+        animateBackground(container_1);
+        updateCactus(container_1);
+        var hyraxInHTML = document.getElementById("hyrax-runner");
+        if (!hyraxInHTML)
+            throw new Error("hyrax-runner element not found");
+        var hyrax_1 = new Hyrax(hyraxInHTML);
+        startCollisionDetection(hyrax_1, container_1);
+        document.addEventListener("keydown", function (e) {
+            if (e.code === "Space" || e.code === "ArrowUp")
+                hyrax_1.jump();
+        });
+        var restartBtn = document.getElementById("restartBtn");
+        if (!restartBtn)
+            throw new Error("restartBtn element not found");
+        restartBtn.addEventListener("click", function () {
+            // reason: user requested a restart button that restarts the game
+            restartGame(hyrax_1, container_1);
+        });
+    }
+    catch (error) {
+        console.error("Event error: ", error);
+    }
+});
+//control
 function startCollisionDetection(hyrax, container) {
     try {
         var collisionInterval_1 = setInterval(function () {
@@ -211,10 +201,7 @@ function isCollision(hyrax, container) {
             var cactusRight = cactusRect.right;
             var cactusTop = cactusRect.top;
             var cactusBottom = cactusRect.bottom;
-            var isOverlapping = hyraxLeft < cactusRight &&
-                hyraxRight > cactusLeft &&
-                hyraxTop < cactusBottom &&
-                hyraxBottom > cactusTop;
+            var isOverlapping = hyraxLeft < cactusRight && hyraxRight > cactusLeft && hyraxTop < cactusBottom && hyraxBottom > cactusTop;
             var hyraxCenter = hyraxRect_1.left + hyraxRect_1.width / 2;
             var cactusCenter = cactusRect.left + cactusRect.width / 2;
             if (hyraxCenter > cactusCenter && !isOverlapping && hyrax.isJump) {
@@ -222,10 +209,9 @@ function isCollision(hyrax, container) {
                 renderScore(hyrax);
                 console.log("Successful jump! +100 points");
             }
-            if (isOverlapping && !hyrax.isDead) {
+            if (isOverlapping && run) {
                 console.log("Collision detected!");
                 run = false;
-                hyrax.isDead = true; // ADDED: mark dead so repeated collisions don't spam; reason: protects logic
                 gameOver(hyrax, container);
                 cactusElements_1.forEach(function (cactus) { return cactus.remove(); });
                 return;
@@ -249,9 +235,9 @@ function animateBackground(container) {
         console.error("animateBackground error: ", error);
     }
 }
+//model
 function gameOver(hyrax, container) {
     try {
-        offset = 0;
         hyrax.htmlElement.style.animation = "none";
         container.style.animation = "none";
         console.log("Game Over! Score:", hyrax.score);
@@ -260,45 +246,44 @@ function gameOver(hyrax, container) {
         if (!gameOverDiv)
             throw new Error("game-over element not found");
         gameOverDiv.style.display = "flex";
-        // CHANGED: use hyrax.score instead of this.score; reason: 'this' here is not Hyrax
         if (hyrax.score > maxScore) {
             maxScore = hyrax.score;
             localStorage.setItem("maxscore", JSON.stringify(maxScore));
         }
-        renderMaxScore(); // ADDED: keep both top and overlay max score in sync
+        renderMaxScore();
+        var gameOverMaxScore = document.getElementById("maxscoreOverlay");
+        if (!gameOverMaxScore)
+            throw new Error("maxscoreOverlay element not found");
+        gameOverMaxScore.innerHTML = maxScore.toString();
+        var gameOverScore = document.getElementById("scoreOverlay");
+        if (!gameOverScore)
+            throw new Error("scoreOverlay element not found");
+        gameOverScore.innerHTML = hyrax.score.toString();
     }
     catch (error) {
         console.error(error);
     }
 }
-// ADDED: restart logic to satisfy "restart the game" requirement
-function restartGame() {
+// control
+function restartGame(hyrax, container) {
     try {
-        if (!containerRef || !hyraxRef)
+        if (!container || !hyrax)
             return;
-        // reset state
-        run = true; // reason: resume loops that check this flag
-        offset = 0; // reason: reset background position
-        hyraxRef.isDead = false; // reason: allow new collisions
-        hyraxRef.isJump = false; // reason: ensure jump state clean
-        hyraxRef.score = 0; // reason: new run starts at 0
-        renderScore(hyraxRef);
-        // reset visuals
-        containerRef.style.opacity = "100%"; // reason: restore normal view
-        hyraxRef.htmlElement.style.bottom = hyraxHeight + "%"; // reason: ensure position baseline
-        hyraxRef.htmlElement.style.animation = "run-cycle 0.3s steps(4) infinite"; // reason: resume running anim
-        // hide overlay
+        run = true;
+        offset = 0;
+        hyrax.isJump = false;
+        hyrax.score = 0;
+        renderScore(hyrax);
+        scrollSpeed = 4;
+        container.style.opacity = "100%";
+        hyrax.htmlElement.style.animation = "run-cycle 0.3s steps(4) infinite";
         var gameOverDiv = document.getElementById("game-over");
-        if (gameOverDiv)
-            gameOverDiv.style.display = "none";
-        // remove any leftover cacti just in case
-        document.querySelectorAll(".cactus").forEach(function (c) { return c.remove(); });
-        // restart loops
-        animateBackground(containerRef);
-        updateCactus(containerRef);
-        startCollisionDetection(hyraxRef, containerRef);
-        // keep max score visible (no change needed, but call to be explicit)
-        renderMaxScore();
+        if (!gameOverDiv)
+            throw new Error("game-over element not found");
+        gameOverDiv.style.display = "none";
+        animateBackground(container);
+        updateCactus(container);
+        startCollisionDetection(hyrax, container);
     }
     catch (error) {
         console.error("restartGame error: ", error);
